@@ -1,0 +1,32 @@
+{
+  "name": "shopdeck",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Back-office admin for \u1eccj\u00e0 Fresh",
+  "workspaces": [
+    "api",
+    "web"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace api & npm run dev --workspace web",
+    "build": "npm run build --workspace web && npm run build --workspace api",
+    "start": "npm run start --workspace api",
+    "lint": "eslint .",
+    "typecheck": "npm run typecheck --workspaces",
+    "test": "npm test --workspace api",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.26",
+    "globals": "^16.5.0",
+    "prettier": "^3.9.10",
+    "typescript-eslint": "^8.46.2"
+  }
+}
