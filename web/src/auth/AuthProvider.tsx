@@ -6,6 +6,9 @@ import { AuthContext, type AuthState } from './context'
 
 const ME_KEY = ['auth', 'me'] as const
 
+// Drop cached data from the previous session, but keep the observer on ME_KEY alive.
+const notAuth = { predicate: (q: { queryKey: readonly unknown[] }) => q.queryKey[0] !== 'auth' }
+
 async function fetchMe(): Promise<SessionUser | null> {
   try {
     const { user } = await api.get<{ user: SessionUser }>('/auth/me')
@@ -29,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(
     async (email: string, password: string) => {
       const { user } = await api.post<{ user: SessionUser }>('/auth/login', { email, password })
-      queryClient.clear()
+      queryClient.removeQueries(notAuth)
       queryClient.setQueryData(ME_KEY, user)
       return user
     },
@@ -38,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     await api.post('/auth/logout')
-    queryClient.clear()
+    queryClient.removeQueries(notAuth)
     queryClient.setQueryData(ME_KEY, null)
   }, [queryClient])
 
