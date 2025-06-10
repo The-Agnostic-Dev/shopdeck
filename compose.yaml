@@ -1,0 +1,38 @@
+# Local stack: Postgres and the API (serves the admin app on :5126).
+# Payfront, Sendbox and Textng are the sandbox fakes inside the API process.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: shopdeck
+      POSTGRES_PASSWORD: shopdeck
+      POSTGRES_DB: shopdeck
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U shopdeck -d shopdeck']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: .
+    image: shopdeck:dev
+    ports:
+      - '5126:5126'
+    environment:
+      DATABASE_URL: postgres://shopdeck:shopdeck@db:5432/shopdeck
+      APP_URL: http://localhost:5126
+      PAYFRONT_BASE_URL: http://localhost:5126/_fake/payfront
+      PAYFRONT_WEBHOOK_URL: http://localhost:5126/api/webhooks/payfront
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:5126/healthz']
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  pgdata:
