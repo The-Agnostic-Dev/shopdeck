@@ -50,7 +50,7 @@ export function LoginPage() {
         <form onSubmit={onSubmit} className="space-y-4" noValidate>
           {error && <Alert tone="error">{error}</Alert>}
           <div className="space-y-1.5">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">Work email</Label>
             <Input id="email" type="email" autoComplete="username" {...form.register('email')} />
             {form.formState.errors.email && <p className="text-xs text-red-600">{form.formState.errors.email.message}</p>}
           </div>
