@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 import { z } from 'zod'
@@ -35,7 +35,7 @@ authRoutes.post('/login', async (c) => {
   const [user] = await db
     .select()
     .from(staffUsers)
-    .where(eq(staffUsers.email, email))
+    .where(eq(sql`lower(${staffUsers.email})`, email.toLowerCase()))
     .limit(1)
   if (!user || !user.active || !(await verifyPassword(password, user.passwordHash))) {
     throw new AppError(401, 'invalid_credentials', 'Email or password is not correct')

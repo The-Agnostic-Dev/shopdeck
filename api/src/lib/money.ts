@@ -27,7 +27,7 @@ export function parseNairaToKobo(input: string | number): number | null {
   const cleaned = input.replace(/[₦,\s]/g, '').replace(/^NGN/i, '')
   if (!/^-?\d+(\.\d{1,2})?$/.test(cleaned)) return null
   const [whole, frac = ''] = cleaned.replace('-', '').split('.')
-  const kobo = Number(whole) * 100 + Number(frac || 0)
+  const kobo = Number(whole) * 100 + Number(frac.padEnd(2, '0'))
   return cleaned.startsWith('-') ? -kobo : kobo
 }
 
