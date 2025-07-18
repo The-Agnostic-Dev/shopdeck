@@ -39,7 +39,7 @@ const sortColumns = {
   status: orders.status,
 }
 
-const itemCount = sql<number>`(select coalesce(sum(${orderItems.quantity}), 0) from ${orderItems} where ${orderItems.orderId} = ${orders.id})`
+const itemCount = sql<number>`(select coalesce(sum(oi.quantity), 0) from order_items oi where oi.order_id = "orders"."id")`
 
 export async function listOrders(query: OrderListQuery) {
   const perPage = query.perPage ?? config.ORDERS_PAGE_SIZE

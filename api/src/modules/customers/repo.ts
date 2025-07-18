@@ -20,9 +20,9 @@ function filters(query: CustomerListQuery): SQL[] {
 }
 
 const orderStats = {
-  orderCount: sql<number>`(select count(*) from ${orders} where ${orders.customerId} = ${customers.id})`,
-  lifetimeKobo: sql<number>`(select coalesce(sum(${orders.totalKobo} - ${orders.refundedKobo}), 0) from ${orders} where ${orders.customerId} = ${customers.id} and ${orders.status} <> 'cancelled')`,
-  lastOrderAt: sql<string | null>`(select max(${orders.placedAt}) from ${orders} where ${orders.customerId} = ${customers.id})`,
+  orderCount: sql<number>`(select count(*) from orders o where o.customer_id = "customers"."id")`,
+  lifetimeKobo: sql<number>`(select coalesce(sum(o.total_kobo - o.refunded_kobo), 0) from orders o where o.customer_id = "customers"."id" and o.status <> 'cancelled')`,
+  lastOrderAt: sql<Date | null>`(select max(o.placed_at) from orders o where o.customer_id = "customers"."id")`.mapWith(orders.placedAt),
 }
 
 /** Newest customers first, in pages for the infinite list. */
