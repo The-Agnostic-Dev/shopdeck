@@ -4,7 +4,7 @@ import { db } from '../../db/client.js'
 import { deliverySlots, orders, products, refunds } from '../../db/schema/index.js'
 import { addDays, lagosDayRange } from '../../lib/dates.js'
 
-const lagosDate = sql<string>`to_char(${orders.placedAt} at time zone ${config.BUSINESS_TZ}, 'YYYY-MM-DD')`
+const lagosDate = sql<string>`to_char(${orders.placedAt} at time zone ${sql.raw(`'${config.BUSINESS_TZ.replace(/'/g, '')}'`)}, 'YYYY-MM-DD')`
 
 /** Net sales: order totals less delivery fees and refunds, cancelled orders excluded. */
 const netSales = sql<number>`coalesce(sum(${orders.totalKobo} - ${orders.deliveryFeeKobo} - ${orders.refundedKobo}), 0)`
