@@ -17,6 +17,7 @@ export function SalesChart({ series }: { series: DashboardData['series'] }) {
           const x = i * (bar + gap)
           return (
             <g key={s.day} data-day={s.day} data-orders={s.orders} data-net-sales={s.netSalesKobo}>
+              <title>{`${weekdayShort(s.day)}: ${formatMoney(s.netSalesKobo)} from ${s.orders} orders`}</title>
               <rect
                 x={x}
                 y={h - bh}
