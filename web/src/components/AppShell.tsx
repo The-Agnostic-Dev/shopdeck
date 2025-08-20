@@ -83,7 +83,7 @@ export function AppShell() {
           <button className="rounded p-2 lg:hidden" onClick={() => setOpen(true)} aria-label="Open menu">
             <Menu className="size-5" />
           </button>
-          <div className="text-sm text-[var(--muted)] max-lg:hidden">Ọjà Fresh</div>
+          <div className="text-sm text-[var(--muted)] max-lg:hidden">Ọjà Fresh · Lagos</div>
           <div className="flex items-center gap-3">
             <div className="text-right text-sm leading-tight">
               <div className="font-medium" data-testid="current-user">
