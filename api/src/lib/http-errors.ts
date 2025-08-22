@@ -26,7 +26,7 @@ export function handleError(err: Error, c: Context) {
   if (err instanceof ZodError) {
     const fields: Record<string, string> = {}
     for (const issue of err.issues) fields[issue.path.join('.') || '_'] = issue.message
-    return c.json({ error: { code: 'validation', message: 'Validation failed', fields } }, 422)
+    return c.json({ error: { code: 'validation', message: 'Some fields are not valid', fields } }, 422)
   }
   if (err instanceof HTTPException) {
     return c.json({ error: { code: 'http', message: err.message } }, err.status)
