@@ -63,6 +63,7 @@ export function LoginPage() {
             {form.formState.isSubmitting ? 'Signing in…' : 'Sign in'}
           </Button>
         </form>
+        <p className="mt-6 text-xs text-[var(--muted)]">Trouble signing in? Ask Adaeze (admin) to reset your account.</p>
       </div>
     </div>
   )
