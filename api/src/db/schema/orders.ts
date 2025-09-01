@@ -9,6 +9,21 @@ export type OrderStatus = (typeof ORDER_STATUSES)[number]
 export const PAYMENT_STATUSES = ['paid', 'partially_refunded', 'refunded'] as const
 export type PaymentStatus = (typeof PAYMENT_STATUSES)[number]
 
+export const discountCodes = pgTable('discount_codes', {
+  id: serial('id').primaryKey(),
+  code: text('code').notNull().unique(),
+  description: text('description'),
+  kind: text('kind', { enum: ['percent', 'fixed'] }).notNull(),
+  value: integer('value').notNull(),
+  minOrderKobo: integer('min_order_kobo').notNull().default(0),
+  maxUses: integer('max_uses'),
+  usedCount: integer('used_count').notNull().default(0),
+  active: boolean('active').notNull().default(true),
+  startsAt: timestamp('starts_at', { withTimezone: true }),
+  endsAt: timestamp('ends_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
 export const orders = pgTable(
   'orders',
   {
@@ -26,6 +41,7 @@ export const orders = pgTable(
     discountKobo: integer('discount_kobo').notNull().default(0),
     deliveryFeeKobo: integer('delivery_fee_kobo').notNull().default(0),
     totalKobo: integer('total_kobo').notNull(),
+    discountCodeId: integer('discount_code_id').references(() => discountCodes.id),
     area: text('area'),
     deliveryAddress: text('delivery_address'),
     notes: text('notes'),
@@ -64,3 +80,4 @@ export const orderItems = pgTable(
 
 export type Order = typeof orders.$inferSelect
 export type OrderItem = typeof orderItems.$inferSelect
+export type DiscountCode = typeof discountCodes.$inferSelect
