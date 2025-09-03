@@ -24,6 +24,19 @@ export const discountCodes = pgTable('discount_codes', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })
 
+export const deliverySlots = pgTable(
+  'delivery_slots',
+  {
+    id: serial('id').primaryKey(),
+    day: date('day').notNull(),
+    startsAt: text('starts_at').notNull(),
+    endsAt: text('ends_at').notNull(),
+    capacity: integer('capacity').notNull(),
+    booked: integer('booked').notNull().default(0),
+  },
+  (t) => [index('delivery_slots_day_idx').on(t.day)],
+)
+
 export const orders = pgTable(
   'orders',
   {
@@ -42,6 +55,7 @@ export const orders = pgTable(
     deliveryFeeKobo: integer('delivery_fee_kobo').notNull().default(0),
     totalKobo: integer('total_kobo').notNull(),
     discountCodeId: integer('discount_code_id').references(() => discountCodes.id),
+    slotId: integer('slot_id').references(() => deliverySlots.id),
     area: text('area'),
     deliveryAddress: text('delivery_address'),
     notes: text('notes'),
@@ -81,3 +95,4 @@ export const orderItems = pgTable(
 export type Order = typeof orders.$inferSelect
 export type OrderItem = typeof orderItems.$inferSelect
 export type DiscountCode = typeof discountCodes.$inferSelect
+export type DeliverySlot = typeof deliverySlots.$inferSelect

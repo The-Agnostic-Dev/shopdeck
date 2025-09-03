@@ -11,6 +11,7 @@ import { dashboardRoutes } from './modules/dashboard/routes.js'
 import { discountRoutes } from './modules/discounts/routes.js'
 import { orderRoutes } from './modules/orders/routes.js'
 import { productRoutes } from './modules/products/routes.js'
+import { slotRoutes } from './modules/slots/routes.js'
 import { staffRoutes } from './modules/staff/routes.js'
 import { mountWebApp } from './static.js'
 
@@ -35,6 +36,8 @@ export function createApp() {
   api.route('/orders', orderRoutes)
   api.route('/products', productRoutes)
   api.route('/customers', customerRoutes)
+  api.route('/discounts', discountRoutes)
+  api.route('/slots', slotRoutes)
   api.route('/staff', staffRoutes)
   app.route('/api', api)
   app.all('/api/*', (c) => c.json({ error: { code: 'not_found', message: 'No such endpoint' } }, 404))

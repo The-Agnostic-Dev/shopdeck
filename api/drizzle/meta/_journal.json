@@ -15,6 +15,13 @@
       "when": 1756713710000,
       "tag": "0001_discount_codes",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1756905372000,
+      "tag": "0002_delivery_slots",
+      "breakpoints": true
     }
   ]
 }
