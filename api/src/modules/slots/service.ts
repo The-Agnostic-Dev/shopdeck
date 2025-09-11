@@ -35,6 +35,9 @@ export async function upcomingSlots(days = 7) {
 export async function updateCapacity(id: number, capacity: number) {
   const [slot] = await db.select().from(deliverySlots).where(eq(deliverySlots.id, id))
   if (!slot) throw notFound('Delivery slot')
+  if (capacity < slot.booked && capacity !== 0) {
+    throw unprocessable(`${slot.booked} orders are already booked in this slot`, { fields: { capacity: `At least ${slot.booked}` } })
+  }
   const [row] = await db.update(deliverySlots).set({ capacity }).where(eq(deliverySlots.id, id)).returning()
   return { ...row, state: slotState(row) }
 }
