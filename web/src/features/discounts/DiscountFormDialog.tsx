@@ -16,7 +16,8 @@ const schema = z.object({
   code: z
     .string()
     .trim()
-    .min(3, 'At least 3 characters'),
+    .min(3, 'At least 3 characters')
+    .regex(/^[A-Za-z0-9-]+$/, 'Letters, numbers and dashes only'),
   description: z.string().optional(),
   kind: z.enum(['percent', 'fixed']),
   value: z.string().min(1, 'Required'),
