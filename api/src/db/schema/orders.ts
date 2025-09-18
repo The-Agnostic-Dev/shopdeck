@@ -54,6 +54,7 @@ export const orders = pgTable(
     discountKobo: integer('discount_kobo').notNull().default(0),
     deliveryFeeKobo: integer('delivery_fee_kobo').notNull().default(0),
     totalKobo: integer('total_kobo').notNull(),
+    refundedKobo: integer('refunded_kobo').notNull().default(0),
     discountCodeId: integer('discount_code_id').references(() => discountCodes.id),
     slotId: integer('slot_id').references(() => deliverySlots.id),
     area: text('area'),

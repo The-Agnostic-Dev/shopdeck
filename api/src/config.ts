@@ -28,6 +28,14 @@ const schema = z.object({
   SESSION_TTL_HOURS: int(12),
   SESSION_SECURE_COOKIE: bool(false),
 
+  PAYMENTS_PROVIDER: z.enum(['sandbox', 'live']).default('sandbox'),
+  PAYFRONT_BASE_URL: z.string().default('http://localhost:5126/_fake/payfront'),
+  PAYFRONT_SECRET_KEY: z.string().default('sk_test_ojafresh_local_4f1c9a'),
+  PAYFRONT_TIMEOUT_MS: int(8000),
+  PAYFRONT_WEBHOOK_URL: z.string().default('http://localhost:5126/api/webhooks/payfront'),
+  FAKE_PAYFRONT_LATENCY_MS: int(400),
+  FAKE_PAYFRONT_WEBHOOK_DELAY_MS: int(1200),
+
   DELIVERY_FEE_KOBO: int(150000),
   LOW_STOCK_DEFAULT_THRESHOLD: int(10),
   ORDERS_PAGE_SIZE: int(25),

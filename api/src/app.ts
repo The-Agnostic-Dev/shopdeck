@@ -4,6 +4,8 @@ import { requestId } from 'hono/request-id'
 import { authRoutes } from './auth/routes.js'
 import { requireAuth, type AppEnv } from './auth/middleware.js'
 import { config } from './config.js'
+import { payfrontFake } from './integrations/payfront/fake/server.js'
+import { payfrontWebhookRoutes } from './integrations/payfront/webhooks.js'
 import { handleError } from './lib/http-errors.js'
 import { logger } from './lib/logger.js'
 import { customerRoutes } from './modules/customers/routes.js'
@@ -11,6 +13,7 @@ import { dashboardRoutes } from './modules/dashboard/routes.js'
 import { discountRoutes } from './modules/discounts/routes.js'
 import { orderRoutes } from './modules/orders/routes.js'
 import { productRoutes } from './modules/products/routes.js'
+import { orderRefundRoutes, refundRoutes } from './modules/payments/routes.js'
 import { slotRoutes } from './modules/slots/routes.js'
 import { staffRoutes } from './modules/staff/routes.js'
 import { mountWebApp } from './static.js'
@@ -29,11 +32,14 @@ export function createApp() {
   app.get('/healthz', (c) => c.json({ ok: true }))
 
   app.route('/api/auth', authRoutes)
+  app.route('/api/webhooks/payfront', payfrontWebhookRoutes)
 
   const api = new Hono<AppEnv>()
   api.use('*', requireAuth)
   api.route('/dashboard', dashboardRoutes)
+  api.route('/orders/:id/refunds', orderRefundRoutes)
   api.route('/orders', orderRoutes)
+  api.route('/refunds', refundRoutes)
   api.route('/products', productRoutes)
   api.route('/customers', customerRoutes)
   api.route('/discounts', discountRoutes)
@@ -41,6 +47,10 @@ export function createApp() {
   api.route('/staff', staffRoutes)
   app.route('/api', api)
   app.all('/api/*', (c) => c.json({ error: { code: 'not_found', message: 'No such endpoint' } }, 404))
+
+  if (process.env.NODE_ENV !== 'production') {
+    app.route('/_fake/payfront', payfrontFake)
+  }
 
   mountWebApp(app)
   return app
