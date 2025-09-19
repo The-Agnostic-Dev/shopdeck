@@ -14,6 +14,7 @@ import type { OrderStatus } from '@/lib/types'
 import { useAssignPicker, useChangeStatus, useOrder, usePickers } from '@/lib/queries/orders'
 import { CancelOrderDialog } from './CancelOrderDialog'
 import { OrderItemsCard } from './OrderItemsCard'
+import { OrderPaymentCard } from './OrderPaymentCard'
 
 const ACTION_LABELS: Partial<Record<OrderStatus, string>> = {
   confirmed: 'Confirm order',
@@ -144,6 +145,7 @@ function DrawerBody({ orderId }: { orderId: number }) {
       )}
 
       <OrderItemsCard detail={data} />
+      <OrderPaymentCard detail={data} />
 
       <CancelOrderDialog open={cancelling} onOpenChange={setCancelling} orderId={order.id} orderNumber={order.number} />
     </div>
