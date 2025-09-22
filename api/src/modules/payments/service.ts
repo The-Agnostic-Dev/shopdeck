@@ -69,6 +69,14 @@ export async function createRefund(orderId: number, input: RefundInput, actor: S
         createdBy: actor.id,
       })
       .returning()
+    await tx
+      .update(orders)
+      .set({
+        refundedKobo: sql`${orders.refundedKobo} + ${input.amountKobo}`,
+        paymentStatus: paymentStatusFor(order.totalKobo, order.refundedKobo + input.amountKobo),
+        updatedAt: new Date(),
+      })
+      .where(eq(orders.id, orderId))
     await record(tx, {
       actorId: actor.id,
       entity: 'order',
