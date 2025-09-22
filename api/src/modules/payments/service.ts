@@ -48,12 +48,18 @@ export async function createRefund(orderId: number, input: RefundInput, actor: S
     })
   }
 
-  const provider = await payfrontRefund({
-    transactionReference: order.paymentReference,
-    amountKobo: input.amountKobo,
-    merchantNote: `${input.reason}${input.note ? `: ${input.note}` : ''}`,
-    customerNote: `Refund for order ${order.number}`,
-  })
+  let provider: PayfrontRefund
+  try {
+    provider = await payfrontRefund({
+      transactionReference: order.paymentReference,
+      amountKobo: input.amountKobo,
+      merchantNote: `${input.reason}${input.note ? `: ${input.note}` : ''}`,
+      customerNote: `Refund for order ${order.number}`,
+    })
+  } catch (err) {
+    if (err instanceof UpstreamError) throw new AppError(502, 'provider_error', err.message)
+    throw err
+  }
 
   return db.transaction(async (tx) => {
     const [refund] = await tx
