@@ -9,11 +9,12 @@ const log = logger.child({ component: 'payfront-webhooks' })
 export const payfrontWebhookRoutes = new Hono()
 
 payfrontWebhookRoutes.post('/', async (c) => {
-  const event = (await c.req.json()) as PayfrontWebhook
-  if (!verifySignature(JSON.stringify(event), c.req.header('x-payfront-signature'))) {
+  const raw = await c.req.text()
+  if (!verifySignature(raw, c.req.header('x-payfront-signature'))) {
     log.warn('rejected webhook with a bad signature')
     return c.json({ error: 'invalid signature' }, 401)
   }
+  const event = JSON.parse(raw) as PayfrontWebhook
   if (event.event.startsWith('refund.')) {
     await applyProviderUpdate(event.data)
   }
