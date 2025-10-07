@@ -34,6 +34,7 @@ export async function requestJson<T = unknown>(
       method,
       headers: { 'content-type': 'application/json', accept: 'application/json', ...headers },
       body: body === undefined ? undefined : JSON.stringify(body),
+      signal: AbortSignal.timeout(timeoutMs),
     })
   } catch (err) {
     logger.warn('upstream request failed', { service, url, err: String(err) })
