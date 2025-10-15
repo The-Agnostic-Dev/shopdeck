@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { logger } from '../../lib/logger.js'
-import { applyProviderUpdate } from '../../modules/payments/service.js'
+import { applyProviderUpdate } from '../../modules/refunds/service.js'
 import { verifySignature } from './signature.js'
 import type { PayfrontWebhook } from './types.js'
 
