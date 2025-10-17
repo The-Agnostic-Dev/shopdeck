@@ -28,6 +28,15 @@ const schema = z.object({
   SESSION_TTL_HOURS: int(12),
   SESSION_SECURE_COOKIE: bool(false),
 
+  RUN_WORKER: z.enum(['inline', 'off']).default('inline'),
+  WORKER_POLL_MS: int(500),
+  WORKER_CONCURRENCY: int(2),
+  CRON_ENABLED: bool(true),
+  LOW_STOCK_SWEEP_MINUTES: int(60),
+  REFUND_SYNC_INTERVAL_SECONDS: int(60),
+  REFUND_SYNC_STALE_MINUTES: int(2),
+  SLOT_RELEASE_INTERVAL_MINUTES: int(15),
+
   PAYMENTS_PROVIDER: z.enum(['sandbox', 'live']).default('sandbox'),
   PAYFRONT_BASE_URL: z.string().default('http://localhost:5126/_fake/payfront'),
   PAYFRONT_SECRET_KEY: z.string().default('sk_test_ojafresh_local_4f1c9a'),

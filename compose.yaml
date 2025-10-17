@@ -1,4 +1,4 @@
-# Local stack: Postgres and the API (serves the admin app on :5126).
+# Local stack: Postgres, the API (serves the admin app on :5126) and the job worker.
 # Payfront, Sendbox and Textng are the sandbox fakes inside the API process.
 services:
   db:
@@ -23,6 +23,7 @@ services:
     environment:
       DATABASE_URL: postgres://shopdeck:shopdeck@db:5432/shopdeck
       APP_URL: http://localhost:5126
+      RUN_WORKER: 'off'
       PAYFRONT_BASE_URL: http://localhost:5126/_fake/payfront
       PAYFRONT_WEBHOOK_URL: http://localhost:5126/api/webhooks/payfront
     depends_on:
@@ -33,6 +34,21 @@ services:
       interval: 5s
       timeout: 3s
       retries: 30
+
+  worker:
+    image: shopdeck:dev
+    command: ['node', 'dist/worker.js']
+    environment:
+      DATABASE_URL: postgres://shopdeck:shopdeck@db:5432/shopdeck
+      APP_URL: http://localhost:5126
+      RUN_MIGRATIONS: 'false'
+      SEED_ON_START: 'false'
+      PAYFRONT_BASE_URL: http://api:5126/_fake/payfront
+      SENDBOX_BASE_URL: http://api:5126/_fake/sendbox
+      TEXTNG_BASE_URL: http://api:5126/_fake/textng
+    depends_on:
+      api:
+        condition: service_healthy
 
 volumes:
   pgdata:

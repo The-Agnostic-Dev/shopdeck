@@ -4,6 +4,8 @@ import { config } from './config.js'
 import { closeDb } from './db/client.js'
 import { runMigrations } from './db/migrate.js'
 import { seed } from './db/seed/index.js'
+import { startCron, stopCron } from './jobs/cron.js'
+import { startWorker, stopWorker } from './jobs/runner.js'
 import { logger } from './lib/logger.js'
 
 async function main() {
@@ -15,9 +17,16 @@ async function main() {
     logger.info('shopdeck api listening', { port: info.port, url: config.APP_URL })
   })
 
+  if (config.RUN_WORKER === 'inline') {
+    startWorker()
+    startCron()
+  }
+
   const shutdown = async (signal: string) => {
     logger.info('shutting down', { signal })
+    stopCron()
     server.close()
+    await stopWorker()
     await closeDb()
     process.exit(0)
   }
