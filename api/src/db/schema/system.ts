@@ -21,4 +21,15 @@ export const jobs = pgTable(
   (t) => [index('jobs_pick_idx').on(t.status, t.runAt)],
 )
 
+export const devOutbox = pgTable('dev_outbox', {
+  id: serial('id').primaryKey(),
+  channel: text('channel', { enum: ['email', 'sms'] }).notNull(),
+  provider: text('provider').notNull(),
+  providerId: text('provider_id').notNull(),
+  recipient: text('recipient').notNull(),
+  subject: text('subject'),
+  body: text('body').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
 export type Job = typeof jobs.$inferSelect

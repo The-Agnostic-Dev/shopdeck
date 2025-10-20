@@ -45,6 +45,15 @@ const schema = z.object({
   FAKE_PAYFRONT_LATENCY_MS: int(400),
   FAKE_PAYFRONT_WEBHOOK_DELAY_MS: int(1200),
 
+  MAIL_PROVIDER: z.enum(['sandbox', 'live']).default('sandbox'),
+  SENDBOX_BASE_URL: z.string().default('http://localhost:5126/_fake/sendbox'),
+  SENDBOX_API_KEY: z.string().default('SB.local.ojafresh'),
+  MAIL_FROM: z.string().default('Ọjà Fresh <hello@ojafresh.ng>'),
+  OPS_ALERT_EMAIL: z.string().default('ops@ojafresh.ng'),
+
+  ENABLE_DEV_ROUTES: bool(true),
+  ENABLE_FAKES: bool(true),
+
   DELIVERY_FEE_KOBO: int(150000),
   LOW_STOCK_DEFAULT_THRESHOLD: int(10),
   ORDERS_PAGE_SIZE: int(25),

@@ -36,6 +36,13 @@
       "when": 1760709371000,
       "tag": "0004_jobs",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1760978421000,
+      "tag": "0005_dev_outbox",
+      "breakpoints": true
     }
   ]
 }

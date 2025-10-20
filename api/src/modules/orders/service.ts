@@ -11,6 +11,7 @@ import {
   type StaffUser,
 } from '../../db/schema/index.js'
 import { conflict, notFound, unprocessable } from '../../lib/http-errors.js'
+import { notifyOrderCancelled } from '../notifications/service.js'
 import { findOrdersForUpdate, itemsFor } from './repo.js'
 
 export const TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
@@ -73,6 +74,7 @@ export async function changeStatus(orderId: number, to: OrderStatus, actor: Staf
       }
     }
     const [updated] = await tx.update(orders).set(patch).where(eq(orders.id, order.id)).returning()
+    if (to === 'cancelled') await notifyOrderCancelled(tx, updated)
     return updated
   })
 }
