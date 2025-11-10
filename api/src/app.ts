@@ -13,6 +13,7 @@ import { logger } from './lib/logger.js'
 import { customerRoutes } from './modules/customers/routes.js'
 import { dashboardRoutes } from './modules/dashboard/routes.js'
 import { discountRoutes } from './modules/discounts/routes.js'
+import { exportRoutes } from './modules/exports/routes.js'
 import { jobRoutes } from './modules/jobs-admin/routes.js'
 import { orderRoutes } from './modules/orders/routes.js'
 import { productRoutes } from './modules/products/routes.js'
@@ -47,6 +48,7 @@ export function createApp() {
   api.route('/customers', customerRoutes)
   api.route('/discounts', discountRoutes)
   api.route('/slots', slotRoutes)
+  api.route('/exports', exportRoutes)
   api.route('/staff', staffRoutes)
   api.route('/jobs', jobRoutes)
   app.route('/api', api)

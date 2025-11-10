@@ -58,6 +58,7 @@ const schema = z.object({
   LOW_STOCK_DEFAULT_THRESHOLD: int(10),
   ORDERS_PAGE_SIZE: int(25),
   CUSTOMERS_PAGE_SIZE: int(50),
+  EXPORT_MAX_ROWS: int(20000),
   IMPORT_MAX_ROWS: int(2000),
 })
 

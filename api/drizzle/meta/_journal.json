@@ -43,6 +43,13 @@
       "when": 1760978421000,
       "tag": "0005_dev_outbox",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1762765681000,
+      "tag": "0006_exports",
+      "breakpoints": true
     }
   ]
 }
