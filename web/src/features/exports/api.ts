@@ -20,6 +20,8 @@ export function useExports() {
   return useQuery({
     queryKey: exportKeys.all,
     queryFn: () => api.get<{ items: ExportRow[] }>('/exports'),
+    // Exports are built in the background; poll while any is still queued.
+    refetchInterval: (q) => (q.state.data?.items.some((e) => e.status === 'queued') ? 2000 : false),
   })
 }
 
