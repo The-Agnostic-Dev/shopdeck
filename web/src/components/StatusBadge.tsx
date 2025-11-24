@@ -44,7 +44,7 @@ export function PaymentBadge({ status }: { status: PaymentStatus }) {
   )
 }
 
-const refundLabels: Record<RefundStatus, string> = { pending: 'Pending', succeeded: 'Refunded', failed: 'Failed' }
+const refundLabels: Record<RefundStatus, string> = { pending: 'Processing', succeeded: 'Refunded', failed: 'Failed' }
 
 export function RefundStatusBadge({ status }: { status: RefundStatus }) {
   const tone: BadgeTone = status === 'succeeded' ? 'green' : status === 'failed' ? 'red' : 'amber'
