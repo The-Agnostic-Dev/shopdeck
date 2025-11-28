@@ -14,6 +14,7 @@ import { customerRoutes } from './modules/customers/routes.js'
 import { dashboardRoutes } from './modules/dashboard/routes.js'
 import { discountRoutes } from './modules/discounts/routes.js'
 import { exportRoutes } from './modules/exports/routes.js'
+import { inventoryRoutes } from './modules/inventory/routes.js'
 import { jobRoutes } from './modules/jobs-admin/routes.js'
 import { orderRoutes } from './modules/orders/routes.js'
 import { productRoutes } from './modules/products/routes.js'
@@ -45,6 +46,7 @@ export function createApp() {
   api.route('/orders', orderRoutes)
   api.route('/refunds', refundRoutes)
   api.route('/products', productRoutes)
+  api.route('/inventory', inventoryRoutes)
   api.route('/customers', customerRoutes)
   api.route('/discounts', discountRoutes)
   api.route('/slots', slotRoutes)

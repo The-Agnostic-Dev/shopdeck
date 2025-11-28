@@ -1,4 +1,5 @@
 import { index, integer, jsonb, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core'
+import { staffUsers } from './staff.js'
 
 export const categories = pgTable('categories', {
   id: serial('id').primaryKey(),
@@ -30,5 +31,23 @@ export const products = pgTable(
   (t) => [index('products_category_idx').on(t.categoryId), index('products_name_idx').on(t.name)],
 )
 
+export const stockMovements = pgTable(
+  'stock_movements',
+  {
+    id: serial('id').primaryKey(),
+    productId: integer('product_id')
+      .notNull()
+      .references(() => products.id, { onDelete: 'cascade' }),
+    kind: text('kind', { enum: ['receive', 'damage', 'correction', 'sale', 'cancel', 'return'] }).notNull(),
+    quantity: integer('quantity').notNull(),
+    stockAfter: integer('stock_after').notNull(),
+    reason: text('reason'),
+    staffId: integer('staff_id').references(() => staffUsers.id),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('stock_movements_product_idx').on(t.productId, t.createdAt)],
+)
+
 export type Product = typeof products.$inferSelect
 export type Category = typeof categories.$inferSelect
+export type StockMovement = typeof stockMovements.$inferSelect
