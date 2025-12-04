@@ -40,6 +40,11 @@ export function ProductDetailPage() {
         actions={
           <>
             {can('inventory:adjust') && <Button onClick={() => setAdjusting(true)}>Adjust stock</Button>}
+            {can('products:write') && (
+              <Button variant="outline" onClick={() => archive.mutate(product.status === 'active')}>
+                {product.status === 'active' ? 'Archive' : 'Restore'}
+              </Button>
+            )}
           </>
         }
       />
