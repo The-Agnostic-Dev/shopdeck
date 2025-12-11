@@ -11,6 +11,7 @@ import {
   type StaffUser,
 } from '../../db/schema/index.js'
 import { conflict, notFound, unprocessable } from '../../lib/http-errors.js'
+import { record } from '../audit/service.js'
 import { notifyOrderCancelled } from '../notifications/service.js'
 import { findOrdersForUpdate, itemsFor } from './repo.js'
 
@@ -74,6 +75,13 @@ export async function changeStatus(orderId: number, to: OrderStatus, actor: Staf
       }
     }
     const [updated] = await tx.update(orders).set(patch).where(eq(orders.id, order.id)).returning()
+    await record(tx, {
+      actorId: actor.id,
+      entity: 'order',
+      entityId: order.id,
+      action: `status.${to}`,
+      details: { from: order.status, to, ...(reason ? { reason } : {}) },
+    })
     if (to === 'cancelled') await notifyOrderCancelled(tx, updated)
     return updated
   })
@@ -98,6 +106,7 @@ export async function assignPicker(orderId: number, pickerId: number | null, act
       throw conflict(`Order ${order.number} is already ${order.status}`)
     }
     const [updated] = await tx.update(orders).set({ pickerId, updatedAt: new Date() }).where(eq(orders.id, orderId)).returning()
+    await record(tx, { actorId: actor.id, entity: 'order', entityId: orderId, action: 'picker.assigned', details: { pickerId } })
     return updated
   })
 }
@@ -145,6 +154,13 @@ export async function substituteItem(
         })
         .where(eq(orderItems.id, itemId))
     }
+    await record(tx, {
+      actorId: actor.id,
+      entity: 'order',
+      entityId: orderId,
+      action: input.substituteProductId === null ? 'item.unavailable' : 'item.substituted',
+      details: { itemId, sku: item.sku, substituteProductId: input.substituteProductId },
+    })
     return tx
       .select()
       .from(orderItems)

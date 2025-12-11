@@ -10,6 +10,7 @@ import { payfrontFake } from './integrations/payfront/fake/server.js'
 import { payfrontWebhookRoutes } from './integrations/payfront/webhooks.js'
 import { handleError } from './lib/http-errors.js'
 import { logger } from './lib/logger.js'
+import { auditRoutes } from './modules/audit/routes.js'
 import { customerRoutes } from './modules/customers/routes.js'
 import { dashboardRoutes } from './modules/dashboard/routes.js'
 import { discountRoutes } from './modules/discounts/routes.js'
@@ -52,6 +53,7 @@ export function createApp() {
   api.route('/slots', slotRoutes)
   api.route('/exports', exportRoutes)
   api.route('/staff', staffRoutes)
+  api.route('/audit', auditRoutes)
   api.route('/jobs', jobRoutes)
   app.route('/api', api)
   app.all('/api/*', (c) => c.json({ error: { code: 'not_found', message: 'No such endpoint' } }, 404))

@@ -47,5 +47,25 @@ export const devOutbox = pgTable('dev_outbox', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })
 
+export const auditLog = pgTable(
+  'audit_log',
+  {
+    id: serial('id').primaryKey(),
+    actorId: integer('actor_id').references(() => staffUsers.id),
+    entity: text('entity').notNull(),
+    entityId: integer('entity_id').notNull(),
+    action: text('action').notNull(),
+    details: jsonb('details').$type<Record<string, unknown>>().notNull().default({}),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('audit_entity_idx').on(t.entity, t.entityId)],
+)
+
+export const settings = pgTable('settings', {
+  key: text('key').primaryKey(),
+  value: jsonb('value').notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
 export type Job = typeof jobs.$inferSelect
 export type ExportRow = typeof exportsTable.$inferSelect
