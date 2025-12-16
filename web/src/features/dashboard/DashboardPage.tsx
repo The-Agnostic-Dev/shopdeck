@@ -69,6 +69,25 @@ export function DashboardPage() {
                 <SalesChart series={data.series} />
               </CardContent>
             </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Needs attention</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <Link to="/orders?status=pending" className="flex justify-between hover:underline">
+                  <span>Orders awaiting confirmation</span>
+                  <span className="font-semibold tabular">{data.summary.awaitingConfirmation}</span>
+                </Link>
+                <Link to="/inventory/low-stock" className="flex justify-between hover:underline">
+                  <span>Products at or below reorder level</span>
+                  <span className="font-semibold tabular">{data.summary.lowStock}</span>
+                </Link>
+                <Link to="/refunds?status=pending" className="flex justify-between hover:underline">
+                  <span>Refunds still processing</span>
+                  <span className="font-semibold tabular">{data.summary.pendingRefunds}</span>
+                </Link>
+              </CardContent>
+            </Card>
           </div>
         </>
       ) : null}
