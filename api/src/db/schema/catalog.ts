@@ -25,6 +25,7 @@ export const products = pgTable(
       .notNull()
       .default('active'),
     images: jsonb('images').$type<string[]>().notNull().default([]),
+    lowStockAlertedAt: timestamp('low_stock_alerted_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },

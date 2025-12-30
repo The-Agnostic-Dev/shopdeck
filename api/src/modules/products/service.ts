@@ -3,6 +3,7 @@ import { db } from '../../db/client.js'
 import { products, type StaffUser } from '../../db/schema/index.js'
 import { conflict, notFound } from '../../lib/http-errors.js'
 import { record } from '../audit/service.js'
+import { clearAlertsIfRestocked, queueAlertsFor } from '../inventory/alerts.js'
 import { findBySku, getProduct } from './repo.js'
 
 export interface ProductInput {
@@ -43,6 +44,10 @@ export async function updateProduct(id: number, input: Partial<ProductInput>, ac
   }
   return db.transaction(async (tx) => {
     const [row] = await tx.update(products).set(patch).where(eq(products.id, id)).returning()
+    if (input.lowStockThreshold !== undefined) {
+      await queueAlertsFor(tx, [id])
+      await clearAlertsIfRestocked(tx, [id])
+    }
     const changed = Object.keys(input).filter((k) => k !== 'images')
     await record(tx, { actorId: actor.id, entity: 'product', entityId: id, action: 'product.updated', details: { changed } })
     return row

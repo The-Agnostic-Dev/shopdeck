@@ -64,6 +64,13 @@
       "when": 1765450375000,
       "tag": "0008_audit_and_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1767104813000,
+      "tag": "0009_low_stock_alerts",
+      "breakpoints": true
     }
   ]
 }

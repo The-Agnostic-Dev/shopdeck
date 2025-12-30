@@ -3,6 +3,7 @@ import { db } from '../../db/client.js'
 import { categories, products, staffUsers, stockMovements, type StaffUser } from '../../db/schema/index.js'
 import { notFound, unprocessable } from '../../lib/http-errors.js'
 import { record } from '../audit/service.js'
+import { clearAlertsIfRestocked, queueAlertsFor } from './alerts.js'
 
 export type AdjustmentKind = 'receive' | 'damage' | 'correction' | 'return'
 
@@ -58,6 +59,8 @@ export async function adjustStock(productId: number, input: AdjustmentInput, act
       details: { delta, stockAfter },
     })
 
+    if (delta < 0) await queueAlertsFor(tx, [productId])
+    else await clearAlertsIfRestocked(tx, [productId])
     return updated
   })
 }

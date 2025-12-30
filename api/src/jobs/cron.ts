@@ -1,6 +1,7 @@
 import { config } from '../config.js'
 import { purgeExpiredSessions } from '../auth/sessions.js'
 import { logger } from '../lib/logger.js'
+import { queueLowStockSweep } from '../modules/inventory/alerts.js'
 import { enqueue, requeueStuckJobs } from './queue.js'
 
 const log = logger.child({ component: 'cron' })
@@ -12,6 +13,11 @@ interface Schedule {
 }
 
 const schedules: Schedule[] = [
+  {
+    name: 'low-stock-sweep',
+    everyMs: config.LOW_STOCK_SWEEP_MINUTES * 60_000,
+    run: queueLowStockSweep,
+  },
   {
     name: 'refund-sync',
     everyMs: config.REFUND_SYNC_INTERVAL_SECONDS * 1000,
