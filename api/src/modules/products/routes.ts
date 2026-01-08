@@ -4,6 +4,7 @@ import { currentUser, requirePermission, type AppEnv } from '../../auth/middlewa
 import { notFound } from '../../lib/http-errors.js'
 import { idParam, readJson, readQuery } from '../../lib/validation.js'
 import { movementsFor } from '../inventory/service.js'
+import { commitImport, previewImport } from './import.js'
 import { getProduct, listCategories, listProducts } from './repo.js'
 import { createProduct, setArchived, updateProduct } from './service.js'
 
@@ -62,4 +63,16 @@ productRoutes.patch('/:id', requirePermission('products:write'), async (c) => {
 productRoutes.post('/:id/archive', requirePermission('products:write'), async (c) => {
   const { archived } = await readJson(c, z.object({ archived: z.boolean() }))
   return c.json({ product: await setArchived(idParam(c), archived, currentUser(c)) })
+})
+
+const importSchema = z.object({ csv: z.string().min(1).max(2_000_000) })
+
+productRoutes.post('/import/preview', requirePermission('products:write'), async (c) => {
+  const { csv } = await readJson(c, importSchema)
+  return c.json(await previewImport(csv))
+})
+
+productRoutes.post('/import', requirePermission('products:write'), async (c) => {
+  const { csv } = await readJson(c, importSchema)
+  return c.json(await commitImport(csv, currentUser(c)))
 })
