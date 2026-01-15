@@ -44,6 +44,7 @@ export function ProductsPage() {
     if (q === (params.get('q') ?? '')) return
     const t = setTimeout(() => update({ q }), 300)
     return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q])
 
   const products = useProducts({ page, q: params.get('q') || undefined, category: category || undefined, lowStock: lowStock || undefined })
