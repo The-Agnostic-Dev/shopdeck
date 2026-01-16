@@ -71,6 +71,13 @@
       "when": 1767104813000,
       "tag": "0009_low_stock_alerts",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1768556012000,
+      "tag": "0010_payfront_events",
+      "breakpoints": true
     }
   ]
 }

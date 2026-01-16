@@ -29,4 +29,14 @@ export const refunds = pgTable(
   ],
 )
 
+export const payfrontEvents = pgTable('payfront_events', {
+  id: serial('id').primaryKey(),
+  eventId: text('event_id').notNull().unique(),
+  event: text('event').notNull(),
+  payload: jsonb('payload').notNull(),
+  receivedAt: timestamp('received_at', { withTimezone: true }).notNull().defaultNow(),
+  processedAt: timestamp('processed_at', { withTimezone: true }),
+  error: text('error'),
+})
+
 export type Refund = typeof refunds.$inferSelect
