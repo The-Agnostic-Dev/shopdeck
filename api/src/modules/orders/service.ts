@@ -143,6 +143,7 @@ export async function substituteItem(
     } else {
       const [sub] = await tx.select().from(products).where(eq(products.id, input.substituteProductId))
       if (!sub || sub.status !== 'active') throw unprocessable('Choose an active product as the substitute')
+      if (sub.stock < item.quantity) throw unprocessable(`Only ${sub.stock} of ${sub.name} in stock`)
       await tx
         .update(orderItems)
         .set({
