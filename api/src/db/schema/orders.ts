@@ -89,6 +89,13 @@ export const orderItems = pgTable(
     unitPriceKobo: integer('unit_price_kobo').notNull(),
     quantity: integer('quantity').notNull(),
     lineTotalKobo: integer('line_total_kobo').notNull(),
+    status: text('status', { enum: ['ok', 'substituted', 'unavailable'] })
+      .notNull()
+      .default('ok'),
+    substituteProductId: integer('substitute_product_id').references(() => products.id),
+    substituteName: text('substitute_name'),
+    substitutePriceKobo: integer('substitute_price_kobo'),
+    note: text('note'),
   },
   (t) => [index('order_items_order_idx').on(t.orderId)],
 )
