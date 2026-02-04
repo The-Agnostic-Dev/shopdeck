@@ -117,6 +117,23 @@ export function useSubstitute(orderId: number) {
   )
 }
 
+export type BulkAction = 'confirm' | 'start_picking' | 'mark_packed' | 'cancel' | 'assign_picker'
+
+export interface BulkResponse {
+  results: { id: number; ok: boolean; error?: string }[]
+  succeeded: number
+  failed: number
+}
+
+export function useBulkAction() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (vars: { ids: number[]; action: BulkAction; reason?: string; pickerId?: number }) =>
+      api.post<BulkResponse>('/orders/bulk', vars),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: orderKeys.all }),
+  })
+}
+
 export function usePickers(enabled: boolean) {
   return useQuery({
     queryKey: ['staff', 'pickers'],

@@ -1,8 +1,11 @@
+import type { RowSelectionState } from '@tanstack/react-table'
+import { useState } from 'react'
 import { PageHeader } from '@/components/PageHeader'
 import { Pagination } from '@/components/Pagination'
 import { Alert } from '@/components/ui/alert'
 import { Card } from '@/components/ui/card'
 import { useOrders } from '@/lib/queries/orders'
+import { BulkActionsBar } from './BulkActionsBar'
 import { OrderDrawer } from './OrderDrawer'
 import { OrderFiltersBar } from './OrderFiltersBar'
 import { OrdersTable } from './OrdersTable'
@@ -10,6 +13,7 @@ import { useOrderFilters } from './useOrderFilters'
 
 export function OrdersPage() {
   const { filters, page, orderId, setFilters, setPage, openOrder, clear } = useOrderFilters()
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
   const orders = useOrders({
     page,
@@ -19,6 +23,10 @@ export function OrdersPage() {
     from: filters.from || undefined,
     to: filters.to || undefined,
   })
+
+  const selectedIds = Object.keys(rowSelection)
+    .filter((id) => rowSelection[id])
+    .map(Number)
 
   return (
     <>
@@ -36,9 +44,12 @@ export function OrdersPage() {
         <OrdersTable
           rows={orders.data?.items ?? []}
           loading={orders.isPending}
+          rowSelection={rowSelection}
+          onRowSelectionChange={setRowSelection}
           onOpen={openOrder}
         />
         {orders.data && <Pagination meta={orders.data.meta} onPage={setPage} />}
+        <BulkActionsBar ids={selectedIds} onDone={() => setRowSelection({})} />
       </Card>
       <OrderDrawer orderId={orderId} onClose={() => openOrder(null)} />
     </>

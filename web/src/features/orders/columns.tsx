@@ -1,4 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import { Checkbox } from '@/components/ui/checkbox'
 import { OrderStatusBadge, PaymentBadge } from '@/components/StatusBadge'
 import { formatDateTime, weekdayShort } from '@/lib/dates'
 import { formatMoney } from '@/lib/money'
@@ -8,6 +9,24 @@ const methodLabel = (o: OrderRow) =>
   o.paymentMethod === 'card' ? `Card •••• ${o.cardLast4 ?? '????'}` : o.paymentMethod === 'transfer' ? 'Bank transfer' : 'USSD'
 
 export const orderColumns: ColumnDef<OrderRow>[] = [
+  {
+    id: 'select',
+    header: ({ table }) => (
+      <Checkbox
+        aria-label="Select all orders on this page"
+        checked={table.getIsAllPageRowsSelected()}
+        onChange={(e) => table.toggleAllPageRowsSelected(e.target.checked)}
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        aria-label={`Select ${row.original.number}`}
+        checked={row.getIsSelected()}
+        onClick={(e) => e.stopPropagation()}
+        onChange={(e) => row.toggleSelected(e.target.checked)}
+      />
+    ),
+  },
   {
     accessorKey: 'number',
     header: 'Order',

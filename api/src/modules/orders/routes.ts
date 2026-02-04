@@ -4,6 +4,7 @@ import { currentUser, requirePermission, type AppEnv } from '../../auth/middlewa
 import { forbidden, notFound } from '../../lib/http-errors.js'
 import { idParam, readJson, readQuery } from '../../lib/validation.js'
 import { historyFor } from '../audit/service.js'
+import { runBulkAction } from './bulk.js'
 import { listOrders, orderDetail } from './repo.js'
 import { bulkSchema, cancelSchema, orderListQuerySchema, pickerSchema, statusChangeSchema, substituteSchema } from './schemas.js'
 import { assignPicker, cancelOrder, changeStatus, substituteItem } from './service.js'
@@ -46,4 +47,17 @@ orderRoutes.post('/:id/items/:itemId/substitute', requirePermission('orders:subs
   const input = await readJson(c, substituteSchema)
   const items = await substituteItem(idParam(c), idParam(c, 'itemId'), input, currentUser(c))
   return c.json({ items })
+})
+
+orderRoutes.post('/bulk', async (c) => {
+  const body = await readJson(c, bulkSchema)
+  const user = currentUser(c)
+  const needed = body.action === 'cancel' ? 'orders:cancel' : 'orders:update_status'
+  if (!can(user.role, needed)) throw forbidden()
+  const results = await runBulkAction(body.ids, body.action, user, body)
+  return c.json({
+    results,
+    succeeded: results.filter((r) => r.ok).length,
+    failed: results.filter((r) => !r.ok).length,
+  })
 })
