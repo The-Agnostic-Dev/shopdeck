@@ -33,7 +33,11 @@ export function BulkActionsBar({ ids, onDone }: { ids: number[]; onDone: () => v
       reason: action === 'cancel' ? reason : undefined,
       pickerId: action === 'assign_picker' ? Number(pickerId) : undefined,
     })
-    toast.success(`${pluralise(res.succeeded, 'order')} updated`)
+    if (res.failed)
+      toast.warning(`${pluralise(res.succeeded, 'order')} updated, ${res.failed} could not be changed`, {
+        description: res.results.find((r) => !r.ok)?.error,
+      })
+    else toast.success(`${pluralise(res.succeeded, 'order')} updated`)
     setReason('')
     onDone()
   }
