@@ -9,6 +9,7 @@ import { customers } from '../../db/schema/index.js'
 import { notFound } from '../../lib/http-errors.js'
 import { idParam, readJson, readQuery } from '../../lib/validation.js'
 import { record } from '../audit/service.js'
+import { createRefund, refundInputSchema } from '../refunds/service.js'
 import { areaCounts, customerOrders, getCustomer, listCustomers } from './repo.js'
 
 const listSchema = z.object({
@@ -60,4 +61,11 @@ customerRoutes.patch('/:id', requirePermission('customers:write'), async (c) => 
     details: { fields: Object.keys(input) },
   })
   return c.json({ customer: row })
+})
+
+// Goodwill refunds raised from the customer page (late delivery, damaged items).
+customerRoutes.post('/:id/orders/:orderId/refund', requirePermission('customers:write'), async (c) => {
+  const input = await readJson(c, refundInputSchema)
+  const result = await createRefund(idParam(c, 'orderId'), input, currentUser(c), idParam(c))
+  return c.json(result, 201)
 })

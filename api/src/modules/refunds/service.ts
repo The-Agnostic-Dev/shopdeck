@@ -37,9 +37,14 @@ function refundableOf(order: Order) {
  * Starts a refund with Payfront and records it. The amount is reserved on the
  * order straight away; it is given back if Payfront later reports a failure.
  */
-export async function createRefund(orderId: number, input: RefundInput, actor: StaffUser) {
+export async function createRefund(
+  orderId: number,
+  input: RefundInput,
+  actor: StaffUser,
+  expectedCustomerId?: number,
+) {
   const [order] = await db.select().from(orders).where(eq(orders.id, orderId))
-  if (!order) throw notFound('Order')
+  if (!order || (expectedCustomerId && order.customerId !== expectedCustomerId)) throw notFound('Order')
   if (order.paymentStatus === 'refunded') throw conflict(`Order ${order.number} has already been refunded in full`)
   const refundable = refundableOf(order)
   if (input.amountKobo > refundable) {
