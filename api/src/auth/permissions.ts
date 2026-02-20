@@ -44,16 +44,7 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'exports:create',
   ],
   picker: [...everyone, 'orders:update_status', 'orders:substitute', 'inventory:adjust'],
-  customer_care: [
-    ...everyone,
-    'orders:cancel',
-    'refunds:read',
-    'refunds:create',
-    'customers:read',
-    'customers:write',
-    'customers:contact',
-    'discounts:read',
-  ],
+  customer_care: [...everyone, 'orders:cancel', 'refunds:read', 'customers:read', 'customers:write', 'customers:contact', 'discounts:read'],
   finance: [...everyone, 'refunds:read', 'refunds:create', 'customers:read', 'customers:contact', 'discounts:read', 'exports:create'],
 }
 
