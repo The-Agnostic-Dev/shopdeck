@@ -31,6 +31,9 @@ async function request<T>(method: string, path: string, body?: unknown, headers?
     headers: { ...(body !== undefined ? { 'content-type': 'application/json' } : {}), ...headers },
     body: body === undefined ? undefined : JSON.stringify(body),
   })
+  if (res.status === 401 && !path.startsWith('/auth/')) {
+    window.dispatchEvent(new Event('shopdeck:signed-out'))
+  }
   const text = await res.text()
   const data = text ? JSON.parse(text) : null
   if (!res.ok) {
