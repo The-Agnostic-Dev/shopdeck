@@ -97,6 +97,11 @@ export function StaffPage() {
                 <TableCell className="text-[var(--muted)]">{s.lastLoginAt ? relativeTime(s.lastLoginAt) : 'Never'}</TableCell>
                 <TableCell className="text-right">
                   {!s.active && <Badge className="mr-2">Deactivated</Badge>}
+                  {s.id !== user?.id && (
+                    <Button size="sm" variant="outline" onClick={() => update.mutate({ id: s.id, active: !s.active })}>
+                      {s.active ? 'Deactivate' : 'Reactivate'}
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
