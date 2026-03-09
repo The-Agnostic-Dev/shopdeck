@@ -36,7 +36,7 @@ export function DiscountsPage() {
     <>
       <PageHeader
         title="Discount codes"
-        description="Codes customers enter at checkout."
+        description="Codes customers enter at checkout. Uses go back to the code when an order is cancelled."
         actions={
           can('discounts:write') && (
             <Button onClick={() => setCreating(true)}>

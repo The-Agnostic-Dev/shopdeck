@@ -12,6 +12,7 @@ import {
 } from '../../db/schema/index.js'
 import { conflict, notFound, unprocessable } from '../../lib/http-errors.js'
 import { record } from '../audit/service.js'
+import { releaseUsage } from '../discounts/service.js'
 import { notifyOrderCancelled } from '../notifications/service.js'
 import { findOrdersForUpdate, itemsFor } from './repo.js'
 
@@ -73,6 +74,7 @@ export async function changeStatus(orderId: number, to: OrderStatus, actor: Staf
           .set({ booked: sql`greatest(${deliverySlots.booked} - 1, 0)` })
           .where(eq(deliverySlots.id, order.slotId))
       }
+      if (order.discountCodeId) await releaseUsage(tx, order.discountCodeId)
     }
     const [updated] = await tx.update(orders).set(patch).where(eq(orders.id, order.id)).returning()
     await record(tx, {
