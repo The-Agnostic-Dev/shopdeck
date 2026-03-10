@@ -13,7 +13,7 @@ import {
 import { conflict, notFound, unprocessable } from '../../lib/http-errors.js'
 import { record } from '../audit/service.js'
 import { releaseUsage } from '../discounts/service.js'
-import { notifyOrderCancelled } from '../notifications/service.js'
+import { notifyOrderCancelled, notifyOutForDelivery } from '../notifications/service.js'
 import { findOrdersForUpdate, itemsFor } from './repo.js'
 
 export const TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
@@ -85,6 +85,7 @@ export async function changeStatus(orderId: number, to: OrderStatus, actor: Staf
       details: { from: order.status, to, ...(reason ? { reason } : {}) },
     })
     if (to === 'cancelled') await notifyOrderCancelled(tx, updated)
+    if (to === 'out_for_delivery') await notifyOutForDelivery(tx, updated)
     return updated
   })
 }
