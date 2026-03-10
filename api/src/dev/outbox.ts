@@ -4,6 +4,7 @@ import { html, raw } from 'hono/html'
 import { db } from '../db/client.js'
 import { devOutbox } from '../db/schema/index.js'
 import { simulateSendboxOutage } from '../integrations/mail/fake.js'
+import { simulateTextngOutage } from '../integrations/sms/fake.js'
 
 // Everything the sandbox providers "sent". Development and staging only.
 
@@ -32,6 +33,7 @@ outboxRoutes.get('/outbox.json', async (c) => {
 outboxRoutes.post('/outbox/simulate', async (c) => {
   const { provider, failNext } = (await c.req.json()) as { provider: 'sendbox' | 'textng'; failNext: number }
   if (provider === 'sendbox') simulateSendboxOutage(failNext)
+  else if (provider === 'textng') simulateTextngOutage(failNext)
   else return c.json({ error: 'provider must be sendbox or textng' }, 400)
   return c.json({ ok: true, provider, failNext })
 })

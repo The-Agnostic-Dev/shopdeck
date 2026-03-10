@@ -51,6 +51,11 @@ const schema = z.object({
   MAIL_FROM: z.string().default('Ọjà Fresh <hello@ojafresh.ng>'),
   OPS_ALERT_EMAIL: z.string().default('ops@ojafresh.ng'),
 
+  SMS_PROVIDER: z.enum(['sandbox', 'live']).default('sandbox'),
+  TEXTNG_BASE_URL: z.string().default('http://localhost:5126/_fake/textng'),
+  TEXTNG_API_KEY: z.string().default('TNG-local-ojafresh'),
+  SMS_SENDER_ID: z.string().default('OjaFresh'),
+
   ENABLE_DEV_ROUTES: bool(true),
   ENABLE_FAKES: bool(true),
 

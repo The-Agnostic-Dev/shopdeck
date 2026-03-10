@@ -8,6 +8,7 @@ import { outboxRoutes } from './dev/outbox.js'
 import { sendboxFake } from './integrations/mail/fake.js'
 import { payfrontFake } from './integrations/payfront/fake/server.js'
 import { payfrontWebhookRoutes } from './integrations/payfront/webhooks.js'
+import { textngFake } from './integrations/sms/fake.js'
 import { handleError } from './lib/http-errors.js'
 import { logger } from './lib/logger.js'
 import { auditRoutes } from './modules/audit/routes.js'
@@ -61,6 +62,7 @@ export function createApp() {
   if (config.ENABLE_FAKES) {
     app.route('/_fake/payfront', payfrontFake)
     app.route('/_fake/sendbox', sendboxFake)
+    app.route('/_fake/textng', textngFake)
   }
   if (config.ENABLE_DEV_ROUTES) app.route('/_dev', outboxRoutes)
 

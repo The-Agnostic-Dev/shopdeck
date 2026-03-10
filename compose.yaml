@@ -27,6 +27,7 @@ services:
       PAYFRONT_BASE_URL: http://localhost:5126/_fake/payfront
       PAYFRONT_WEBHOOK_URL: http://localhost:5126/api/webhooks/payfront
       SENDBOX_BASE_URL: http://localhost:5126/_fake/sendbox
+      TEXTNG_BASE_URL: http://localhost:5126/_fake/textng
     depends_on:
       db:
         condition: service_healthy
