@@ -4,8 +4,15 @@ import { db } from '../../db/client.js'
 import { devOutbox } from '../../db/schema/index.js'
 import { shortRef } from '../../lib/ids.js'
 
-// Local stand-in for Sendbox's v2 API. Accepts a message, stores it in the dev
-// outbox and answers like the real service.
+// Local stand-in for Sendbox's v3 API. Accepts a message, stores it in the dev
+// outbox and answers like the real service: 202 Accepted, empty body, the
+// message id in X-Message-Id.
+
+interface SendBody {
+  personalizations?: { to?: { email: string }[] }[]
+  subject?: string
+  content?: { type: string; value: string }[]
+}
 
 let failNext = 0
 
@@ -15,24 +22,29 @@ export function simulateSendboxOutage(count: number) {
 
 export const sendboxFake = new Hono()
 
-sendboxFake.post('/v2/send', async (c) => {
+sendboxFake.post('/v3/mail/send', async (c) => {
   if (c.req.header('authorization') !== `Bearer ${config.SENDBOX_API_KEY}`) {
-    return c.json({ error: 'Invalid API key' }, 401)
+    return c.json({ errors: [{ message: 'The provided authorization grant is invalid, expired, or revoked' }] }, 401)
   }
   if (failNext > 0) {
     failNext--
-    return c.json({ error: 'Service temporarily unavailable' }, 503)
+    return c.json({ errors: [{ message: 'Service temporarily unavailable' }] }, 503)
   }
-  const body = (await c.req.json()) as { to?: string; subject?: string; text?: string }
-  if (!body.to || !body.subject || !body.text) return c.json({ error: 'to, subject and text are required' }, 400)
+  const body = (await c.req.json()) as SendBody
+  const to = body.personalizations?.[0]?.to?.[0]?.email
+  const text = body.content?.find((p) => p.type === 'text/plain')?.value
+  if (!to || !body.subject || !text) {
+    return c.json({ errors: [{ message: 'personalizations, subject and content are required' }] }, 400)
+  }
   const id = shortRef('sbx', 16)
   await db.insert(devOutbox).values({
     channel: 'email',
     provider: 'sendbox',
     providerId: id,
-    recipient: body.to,
+    recipient: to,
     subject: body.subject,
-    body: body.text,
+    body: text,
   })
-  return c.json({ message: 'success', id })
+  c.header('X-Message-Id', id)
+  return c.body(null, 202)
 })
