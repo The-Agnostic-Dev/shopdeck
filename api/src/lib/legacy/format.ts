@@ -1,4 +1,5 @@
-// Display helpers.
+// Formatting helpers from the first version of the admin, when amounts were
+// stored in naira. Still imported by a few older reports.
 
 /** 12500 -> "₦12,500.00" (input in naira). */
 export function formatNaira(naira: number): string {

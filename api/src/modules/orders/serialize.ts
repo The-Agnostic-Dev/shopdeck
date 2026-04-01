@@ -1,6 +1,6 @@
 import { can } from '../../auth/permissions.js'
 import type { StaffUser } from '../../db/schema/index.js'
-import { formatPhone } from '../../lib/format.js'
+import { formatPhone } from '../../lib/legacy/format.js'
 import type { historyFor } from '../audit/service.js'
 import type { orderDetail } from './repo.js'
 import { STATUS_LABELS, TRANSITIONS } from './service.js'

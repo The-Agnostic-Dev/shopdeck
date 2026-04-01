@@ -21,3 +21,4 @@ Percent discounts round half up to the nearest kobo, once, on the subtotal.
 
 - No float drift in totals.
 - `integer` caps a single amount at about ₦21 million, far above any order we take.
+- Older helpers that take naira (`lib/legacy/format.ts` in the API, `formatNaira` in the web app) still exist for a few reports; do not pass kobo to them.
