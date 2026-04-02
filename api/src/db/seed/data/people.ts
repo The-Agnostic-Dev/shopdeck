@@ -49,6 +49,8 @@ export const FIRST_NAMES = [
   'Chukwuma',
   'Hauwa',
   'Yusuf',
+  'Victoria',
+  'Damilola',
 ]
 
 export const LAST_NAMES = [
