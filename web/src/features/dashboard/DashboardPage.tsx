@@ -49,6 +49,7 @@ export function DashboardPage() {
               testId="stat-net-sales"
               label="Net sales"
               value={formatMoney(data.summary.netSalesKobo)}
+              hint="Order totals less delivery fees and refunds. Cancelled orders are not counted."
             />
             <StatCard testId="stat-orders" label="Orders" value={data.summary.orders} hint={`${data.summary.cancelled} cancelled`} />
             <StatCard testId="stat-basket" label="Average basket" value={formatMoney(data.summary.averageBasketKobo)} />
