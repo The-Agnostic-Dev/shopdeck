@@ -71,6 +71,25 @@ Password for everyone: `shopdeck2026`
 | care@ojafresh.ng | Blessing Etim | Customer care |
 | finance@ojafresh.ng | Ifeoma Nwankwo | Finance |
 
+## Roles
+
+| | Admin | Ops lead | Picker | Customer care | Finance |
+| --- | --- | --- | --- | --- | --- |
+| Orders: view | yes | yes | yes | yes | yes |
+| Orders: confirm, pick, pack, dispatch | yes | yes | yes | | |
+| Orders: cancel | yes | yes | | yes | |
+| Refunds: issue | yes | | | | yes |
+| Refunds: view | yes | yes | | yes | yes |
+| Products and prices | yes | yes | | | |
+| Stock adjustments | yes | yes | yes | | |
+| Customers: view contact details | yes | yes | | yes | yes |
+| Customers: notes | yes | | | yes | |
+| Discount codes: create and switch off | yes | | | | |
+| Exports | yes | yes | | | yes |
+| Staff and roles | yes | | | | |
+
+The matrix lives in `api/src/auth/permissions.ts`; the web app reads the same list from `/api/auth/me` to hide what you cannot use.
+
 ## How things work
 
 - **Money** is stored and sent as integer kobo (`totalKobo: 1250000` is ₦12,500.00). Format only at the edge: `formatKobo` in the API, `formatMoney` in the web app. See `docs/adr/0001-kobo-integers.md`.
@@ -81,6 +100,26 @@ Password for everyone: `shopdeck2026`
 - **Low stock:** each product has a reorder level. When a stock change takes it to or below that level, ops@ojafresh.ng gets one email; it can alert again after it has been restocked above the level. An hourly sweep catches changes made outside Shopdeck.
 - **Exports** are built by the worker; you get an email when the file is ready and can download it from the Exports page.
 - **Customers list** loads 50 at a time, newest first; "Load more" fetches the next page.
+
+## Background jobs
+
+`api/src/jobs/queue.ts` stores jobs in the `jobs` table. The worker claims due jobs with `FOR UPDATE SKIP LOCKED`, so you can run more than one. A failed job is retried up to `JOB_MAX_ATTEMPTS` times with a doubling delay starting at `JOB_BACKOFF_MS`. Admins can see the queue under Settings → Background jobs. Schedules (`jobs/cron.ts`): low-stock sweep hourly, refund sync every minute, stuck job requeue every minute, expired session purge hourly.
+
+## Fakes for outside services
+
+Nothing in development talks to the internet. Each provider has a fake mounted inside the API under `/_fake/*` when `ENABLE_FAKES=true`:
+
+| Provider | Real use | Fake | Notes |
+| --- | --- | --- | --- |
+| Payfront | card and transfer payments, refunds | `api/src/integrations/payfront/fake` | Refunds answer after ~400 ms, then signed webhooks arrive: `refund.processing`, `refund.processed`. |
+| Sendbox | transactional email (v3 API) | `api/src/integrations/mail/fake.ts` | Accepts the message, stores it in the dev outbox. |
+| Textng | SMS | `api/src/integrations/sms/fake.ts` | Same, for SMS. |
+
+**Dev outbox:** http://localhost:5126/_dev/outbox lists every email and SMS the fakes accepted (JSON at `/_dev/outbox.json`). You can also make the next N sends fail, to see retries:
+
+```bash
+curl -X POST localhost:5126/_dev/outbox/simulate -H 'content-type: application/json' -d '{"provider":"sendbox","failNext":1}'
+```
 
 ## Tests and checks
 
