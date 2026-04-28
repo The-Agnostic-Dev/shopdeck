@@ -10,6 +10,7 @@ describe('money helpers', () => {
 
   it('writes CSV friendly amounts', () => {
     assert.equal(koboToNairaString(1_250_050), '12500.50')
+    assert.equal(koboToNairaString(-150), '-1.50')
   })
 
   it('parses what staff type', () => {
