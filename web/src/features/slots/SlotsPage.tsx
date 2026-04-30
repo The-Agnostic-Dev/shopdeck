@@ -55,7 +55,7 @@ export function SlotsPage() {
 
   return (
     <>
-      <PageHeader title="Delivery slots" description="Next 7 days." />
+      <PageHeader title="Delivery slots" description="Next 7 days. A slot with capacity 0 is closed and not offered at checkout." />
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {days.map((day) => (
           <Card key={day} className="p-3">

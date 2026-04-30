@@ -59,7 +59,7 @@ export function CustomersPage() {
                     <Link to={`/customers/${c.id}`} className="font-medium text-brand-700 hover:underline">
                       {c.name}
                     </Link>
-                    <div className="text-xs text-[var(--muted)]">{c.email}</div>
+                    <div className="text-xs text-[var(--muted)]">{c.email || 'Contact hidden'}</div>
                   </TableCell>
                   <TableCell>{c.area}</TableCell>
                   <TableCell className="text-[var(--muted)]">{formatDate(c.createdAt)}</TableCell>
