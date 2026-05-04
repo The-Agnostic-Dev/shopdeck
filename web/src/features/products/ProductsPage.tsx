@@ -75,7 +75,7 @@ export function ProductsPage() {
             <Input
               aria-label="Search products"
               className="pl-8"
-              placeholder="Name, brand or SKU"
+              placeholder="Name, brand, SKU or barcode"
               value={q}
               onChange={(e) => setQ(e.target.value)}
             />

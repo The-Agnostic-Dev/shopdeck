@@ -13,6 +13,7 @@ export interface Product {
   costKobo: number | null
   stock: number
   lowStockThreshold: number
+  barcode: string | null
   status: 'active' | 'archived'
   images: string[]
   updatedAt: string
@@ -66,7 +67,7 @@ export function useCategories() {
 
 export type ProductInput = Pick<
   Product,
-  'sku' | 'name' | 'brand' | 'unit' | 'categoryId' | 'priceKobo' | 'costKobo' | 'lowStockThreshold'
+  'sku' | 'name' | 'brand' | 'unit' | 'categoryId' | 'priceKobo' | 'costKobo' | 'lowStockThreshold' | 'barcode'
 >
 
 export function useSaveProduct(id?: number) {
