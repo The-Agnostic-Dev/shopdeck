@@ -19,6 +19,7 @@ const HEADER_ALIASES: Record<string, string> = {
   'price naira': 'price',
   'low stock at': 'threshold',
   'reorder level': 'threshold',
+  ean: 'barcode',
 }
 
 export interface ImportRow {
@@ -30,6 +31,7 @@ export interface ImportRow {
   category: string
   priceKobo: number
   threshold: number
+  barcode: string | null
 }
 
 export interface ImportPreview {
@@ -80,6 +82,7 @@ export async function previewImport(csvText: string): Promise<ImportPreview> {
       category: get('category'),
       priceKobo,
       threshold,
+      barcode: get('barcode') || null,
     })
   })
 
@@ -119,6 +122,7 @@ export async function commitImport(csvText: string, actor: StaffUser) {
         categoryId: catId.get(r.category.toLowerCase()) ?? null,
         priceKobo: r.priceKobo,
         lowStockThreshold: r.threshold,
+        barcode: r.barcode,
         updatedAt: new Date(),
       }
       const [row] = await tx

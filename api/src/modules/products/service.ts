@@ -15,6 +15,7 @@ export interface ProductInput {
   priceKobo: number
   costKobo?: number | null
   lowStockThreshold: number
+  barcode?: string | null
   images?: string[]
 }
 

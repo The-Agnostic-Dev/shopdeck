@@ -21,6 +21,7 @@ export const products = pgTable(
     costKobo: integer('cost_kobo'),
     stock: integer('stock').notNull().default(0),
     lowStockThreshold: integer('low_stock_threshold').notNull().default(10),
+    barcode: text('barcode'),
     status: text('status', { enum: ['active', 'archived'] })
       .notNull()
       .default('active'),

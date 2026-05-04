@@ -5,5 +5,5 @@ import { products } from '../../db/schema/index.js'
 export function productSearch(raw: string): SQL {
   const term = raw.trim()
   const like = `%${term.replace(/[%_]/g, (m) => '\\' + m)}%`
-  return or(ilike(products.name, like), ilike(products.brand, like), ilike(products.sku, like))!
+  return or(ilike(products.name, like), ilike(products.brand, like), ilike(products.sku, like), ilike(products.barcode, like))!
 }

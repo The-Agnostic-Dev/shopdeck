@@ -24,6 +24,7 @@ export const PRODUCT_EXPORT_COLUMNS = [
   'Brand',
   'Category',
   'Unit',
+  'Barcode',
   'Price (NGN)',
   'Cost (NGN)',
   'Stock',

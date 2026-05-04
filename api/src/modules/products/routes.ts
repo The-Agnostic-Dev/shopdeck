@@ -34,6 +34,11 @@ const productSchema = z.object({
   priceKobo: z.number().int().positive(),
   costKobo: z.number().int().nonnegative().nullish(),
   lowStockThreshold: z.number().int().nonnegative().max(10_000),
+  barcode: z
+    .string()
+    .trim()
+    .regex(/^\d{8,14}$/, '8 to 14 digits')
+    .nullish(),
   images: z.array(z.string().url()).max(8).optional(),
 })
 

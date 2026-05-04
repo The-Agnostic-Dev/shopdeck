@@ -41,6 +41,7 @@ export const productColumns = {
   costKobo: products.costKobo,
   stock: products.stock,
   lowStockThreshold: products.lowStockThreshold,
+  barcode: products.barcode,
   status: products.status,
   images: products.images,
   updatedAt: products.updatedAt,

@@ -57,6 +57,7 @@ export async function seedCatalog(rng: Rng, opts: { now: Date; adminId: number }
           costKobo: Math.round((priceFor(price, si) * rng.int(68, 84)) / 100 / 100) * 100,
           stock: low ? rng.int(0, threshold) : rng.int(threshold + 8, threshold + 260),
           lowStockThreshold: threshold,
+          barcode: rng.chance(0.85) ? ean13(rng) : null,
           status: rng.chance(0.03) ? 'archived' : 'active',
           images: rng.chance(0.8) ? [`/media/products/${cat.prefix.toLowerCase()}-${n}.jpg`] : [],
           lowStockAlertedAt: low ? new Date(opts.now.getTime() - rng.int(1, 72) * 3_600_000) : null,

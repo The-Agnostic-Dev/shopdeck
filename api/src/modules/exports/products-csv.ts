@@ -16,6 +16,7 @@ export async function buildProductsCsv(filters: Record<string, string>) {
       brand: products.brand,
       category: categories.name,
       unit: products.unit,
+      barcode: products.barcode,
       priceKobo: products.priceKobo,
       costKobo: products.costKobo,
       stock: products.stock,
