@@ -14,7 +14,7 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
 const orderTones: Record<OrderStatus, BadgeTone> = {
   pending: 'amber',
   confirmed: 'blue',
-  picking: 'blue',
+  picking: 'violet',
   packed: 'violet',
   out_for_delivery: 'blue',
   delivered: 'green',
