@@ -29,7 +29,7 @@ export async function buildExport(exportId: number) {
   const [row] = await db.select().from(exportsTable).where(eq(exportsTable.id, exportId))
   if (!row) throw notFound('Export')
   const { csv, rows } = await builders[row.kind](row.filters)
-  const filename = `ojafresh-${row.kind}-${lagosDay()}.csv`
+  const filename = `ojafresh-${row.kind}-${lagosDay()}-${row.id}.csv`
   const [done] = await db
     .update(exportsTable)
     .set({ status: 'ready', content: csv, rowCount: rows, filename, completedAt: new Date() })
