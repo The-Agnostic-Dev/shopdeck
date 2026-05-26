@@ -100,7 +100,7 @@ export function ProductsPage() {
             ))}
           </div>
         ) : !products.data?.items.length ? (
-          <EmptyState title="No products found" />
+          <EmptyState title="No products found">Check the spelling, or search by SKU (for example GRA-0105).</EmptyState>
         ) : (
           <Table data-testid="products-table">
             <TableHeader>
