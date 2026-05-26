@@ -59,7 +59,7 @@ export async function summaryFor(day: string) {
     day,
     orders: sales.orders,
     netSalesKobo: sales.netSalesKobo,
-    averageBasketKobo: sales.orders ? sales.netSalesKobo / sales.orders : 0,
+    averageBasketKobo: sales.orders ? Math.round(sales.netSalesKobo / sales.orders) : 0,
     cancelled: cancelled.n,
     packing: {
       due: packing.due,
