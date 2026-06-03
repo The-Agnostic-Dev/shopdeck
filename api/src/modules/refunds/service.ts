@@ -36,13 +36,20 @@ function refundableOf(order: Order) {
 /**
  * Starts a refund with Payfront and records it. The amount is reserved on the
  * order straight away; it is given back if Payfront later reports a failure.
+ * Repeating a request with the same idempotency key returns the first refund.
  */
 export async function createRefund(
   orderId: number,
   input: RefundInput,
   actor: StaffUser,
+  idempotencyKey?: string,
   expectedCustomerId?: number,
 ) {
+  if (idempotencyKey) {
+    const [existing] = await db.select().from(refunds).where(eq(refunds.idempotencyKey, idempotencyKey)).limit(1)
+    if (existing) return { refund: existing, replayed: true }
+  }
+
   const [order] = await db.select().from(orders).where(eq(orders.id, orderId))
   if (!order || (expectedCustomerId && order.customerId !== expectedCustomerId)) throw notFound('Order')
   if (order.paymentStatus === 'refunded') throw conflict(`Order ${order.number} has already been refunded in full`)
@@ -77,6 +84,7 @@ export async function createRefund(
         status: mapRefundStatus(provider.status),
         providerRef: String(provider.id),
         providerStatus: provider.status,
+        idempotencyKey: idempotencyKey ?? null,
         createdBy: actor.id,
       })
       .returning()
@@ -95,7 +103,7 @@ export async function createRefund(
       action: 'refund.created',
       details: { refundId: refund.id, amountKobo: input.amountKobo, reason: input.reason },
     })
-    return { refund }
+    return { refund, replayed: false }
   })
 }
 

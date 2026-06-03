@@ -28,6 +28,6 @@ export const orderRefundRoutes = new Hono<AppEnv>()
 
 orderRefundRoutes.post('/', requirePermission('refunds:create'), async (c) => {
   const input = await readJson(c, refundInputSchema)
-  const result = await createRefund(idParam(c), input, currentUser(c))
-  return c.json(result, 201)
+  const result = await createRefund(idParam(c), input, currentUser(c), c.req.header('idempotency-key'))
+  return c.json(result, result.replayed ? 200 : 201)
 })

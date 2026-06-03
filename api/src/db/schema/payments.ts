@@ -18,6 +18,7 @@ export const refunds = pgTable(
     status: text('status', { enum: REFUND_STATUSES }).notNull().default('pending'),
     providerRef: text('provider_ref'),
     providerStatus: text('provider_status'),
+    idempotencyKey: text('idempotency_key'),
     failureReason: text('failure_reason'),
     createdBy: integer('created_by').references(() => staffUsers.id),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -25,6 +26,7 @@ export const refunds = pgTable(
   },
   (t) => [
     index('refunds_order_idx').on(t.orderId),
+    index('refunds_idempotency_idx').on(t.idempotencyKey),
     index('refunds_provider_ref_idx').on(t.providerRef),
   ],
 )

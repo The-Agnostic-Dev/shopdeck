@@ -66,6 +66,6 @@ customerRoutes.patch('/:id', requirePermission('customers:write'), async (c) => 
 // Goodwill refunds raised from the customer page (late delivery, damaged items).
 customerRoutes.post('/:id/orders/:orderId/refund', requirePermission('customers:write'), async (c) => {
   const input = await readJson(c, refundInputSchema)
-  const result = await createRefund(idParam(c, 'orderId'), input, currentUser(c), idParam(c))
-  return c.json(result, 201)
+  const result = await createRefund(idParam(c, 'orderId'), input, currentUser(c), c.req.header('idempotency-key'), idParam(c))
+  return c.json(result, result.replayed ? 200 : 201)
 })
