@@ -63,8 +63,12 @@ export function useUpdateCustomer(id: number) {
 export function useGoodwillRefund(customerId: number) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (vars: { orderId: number; amountKobo: number; reason: string; note?: string }) =>
-      api.post(`/customers/${customerId}/orders/${vars.orderId}/refund`, { amountKobo: vars.amountKobo, reason: vars.reason, note: vars.note }),
+    mutationFn: (vars: { orderId: number; amountKobo: number; reason: string; note?: string; idempotencyKey: string }) =>
+      api.post(
+        `/customers/${customerId}/orders/${vars.orderId}/refund`,
+        { amountKobo: vars.amountKobo, reason: vars.reason, note: vars.note },
+        { 'Idempotency-Key': vars.idempotencyKey },
+      ),
     onSuccess: () =>
       Promise.all([
         queryClient.invalidateQueries({ queryKey: customerKeys.detail(customerId) }),

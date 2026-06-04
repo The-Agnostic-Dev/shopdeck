@@ -54,6 +54,7 @@ export function RefundDialog({ open, onOpenChange, orderId, orderNumber, refunda
         amountKobo,
         reason: values.reason,
         note: values.note || undefined,
+        idempotencyKey: crypto.randomUUID(),
       })
       toast.success(`Refund of ${formatMoney(amountKobo)} sent to Payfront`, { description: `Order ${orderNumber}` })
       onOpenChange(false)

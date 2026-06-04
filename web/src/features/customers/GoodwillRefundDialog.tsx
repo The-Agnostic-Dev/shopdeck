@@ -29,7 +29,7 @@ export function GoodwillRefundDialog({
     const kobo = parseMoneyInput(amount)
     if (!kobo || kobo > max) return setError(`Enter an amount up to ${formatMoney(max)}`)
     try {
-      await refund.mutateAsync({ orderId: order.id, amountKobo: kobo, reason })
+      await refund.mutateAsync({ orderId: order.id, amountKobo: kobo, reason, idempotencyKey: crypto.randomUUID() })
       toast.success(`Refund of ${formatMoney(kobo)} started for ${order.number}`)
       setAmount('')
       onClose()

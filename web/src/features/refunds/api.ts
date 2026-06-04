@@ -37,6 +37,7 @@ export interface CreateRefundVars {
   amountKobo: number
   reason: RefundReason
   note?: string
+  idempotencyKey: string
 }
 
 export function useCreateRefund(orderId: number) {
