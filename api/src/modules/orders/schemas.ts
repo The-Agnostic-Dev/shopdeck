@@ -1,11 +1,8 @@
 import { z } from 'zod'
 import { ORDER_STATUSES, PAYMENT_STATUSES } from '../../db/schema/index.js'
+import { listQuerySchema } from '../../lib/query.js'
 
-export const orderListQuerySchema = z.object({
-  page: z.coerce.number().int().min(1).default(1),
-  perPage: z.coerce.number().int().min(1).max(200).optional(),
-  q: z.string().trim().max(120).optional(),
-  dir: z.enum(['asc', 'desc']).default('desc'),
+export const orderListQuerySchema = listQuerySchema.extend({
   status: z.string().optional(),
   payment: z.enum(PAYMENT_STATUSES).optional(),
   from: z.string().optional(),

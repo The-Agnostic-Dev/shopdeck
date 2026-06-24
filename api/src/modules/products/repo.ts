@@ -1,7 +1,7 @@
 import { and, asc, count, desc, eq, lte, sql, type SQL } from 'drizzle-orm'
 import { db } from '../../db/client.js'
 import { categories, products } from '../../db/schema/index.js'
-import { offsetFor, pageMeta } from '../../lib/pagination.js'
+import { offsetFor, pageMeta } from '../../lib/query.js'
 import { productSearch } from './search.js'
 
 export interface ProductListQuery {

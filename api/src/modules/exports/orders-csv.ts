@@ -4,8 +4,7 @@ import { db } from '../../db/client.js'
 import { customers, discountCodes, orders, type OrderStatus } from '../../db/schema/index.js'
 import { toCsv } from '../../lib/csv.js'
 import { koboToNairaString } from '../../lib/money.js'
-import { lagosDayRange } from '../../lib/dates.js'
-import { csvParam } from '../../lib/pagination.js'
+import { csvParam, parseDateRange } from '../../lib/query.js'
 import { STATUS_LABELS } from '../orders/service.js'
 import { ORDER_EXPORT_COLUMNS } from './columns.js'
 
@@ -20,8 +19,9 @@ export async function buildOrdersCsv(filters: Record<string, string>) {
   const where: SQL[] = []
   const statuses = csvParam(filters.status) as OrderStatus[]
   if (statuses.length) where.push(inArray(orders.status, statuses))
-  if (filters.from) where.push(gte(orders.placedAt, lagosDayRange(filters.from).start))
-  if (filters.to) where.push(lt(orders.placedAt, lagosDayRange(filters.to).end))
+  const range = parseDateRange(filters)
+  if (range.from) where.push(gte(orders.placedAt, range.from))
+  if (range.to) where.push(lt(orders.placedAt, range.to))
 
   const rows = await db
     .select({

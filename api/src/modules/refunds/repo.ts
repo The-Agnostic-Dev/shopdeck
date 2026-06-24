@@ -1,8 +1,7 @@
 import { and, count, desc, eq, gte, lt, type SQL } from 'drizzle-orm'
 import { db } from '../../db/client.js'
 import { customers, orders, refunds, staffUsers, type RefundStatus } from '../../db/schema/index.js'
-import { lagosDayRange } from '../../lib/dates.js'
-import { offsetFor, pageMeta } from '../../lib/pagination.js'
+import { offsetFor, pageMeta, parseDateRange } from '../../lib/query.js'
 
 export interface RefundListQuery {
   page: number
@@ -17,8 +16,9 @@ export async function listRefunds(query: RefundListQuery) {
   const where: SQL[] = []
   if (query.status) where.push(eq(refunds.status, query.status))
   if (query.reason) where.push(eq(refunds.reason, query.reason))
-  if (query.from) where.push(gte(refunds.createdAt, lagosDayRange(query.from).start))
-  if (query.to) where.push(lt(refunds.createdAt, lagosDayRange(query.to).end))
+  const range = parseDateRange(query)
+  if (range.from) where.push(gte(refunds.createdAt, range.from))
+  if (range.to) where.push(lt(refunds.createdAt, range.to))
   const cond = and(...where)
 
   const [items, [{ total }]] = await Promise.all([
@@ -53,9 +53,10 @@ export async function listRefunds(query: RefundListQuery) {
 }
 
 export async function refundTotals(query: Pick<RefundListQuery, 'from' | 'to'>) {
+  const range = parseDateRange(query)
   const where: SQL[] = []
-  if (query.from) where.push(gte(refunds.createdAt, lagosDayRange(query.from).start))
-  if (query.to) where.push(lt(refunds.createdAt, lagosDayRange(query.to).end))
+  if (range.from) where.push(gte(refunds.createdAt, range.from))
+  if (range.to) where.push(lt(refunds.createdAt, range.to))
   const rows = await db
     .select({ status: refunds.status, amountKobo: refunds.amountKobo })
     .from(refunds)

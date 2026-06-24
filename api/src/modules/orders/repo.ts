@@ -11,8 +11,7 @@ import {
   staffUsers,
   type OrderStatus,
 } from '../../db/schema/index.js'
-import { lagosDayRange } from '../../lib/dates.js'
-import { csvParam, offsetFor, pageMeta } from '../../lib/pagination.js'
+import { csvParam, offsetFor, pageMeta, parseDateRange } from '../../lib/query.js'
 import type { OrderListQuery } from './schemas.js'
 
 function filtersFor(query: OrderListQuery): SQL[] {
@@ -20,8 +19,9 @@ function filtersFor(query: OrderListQuery): SQL[] {
   const statuses = csvParam(query.status) as OrderStatus[]
   if (statuses.length) where.push(inArray(orders.status, statuses))
   if (query.payment) where.push(eq(orders.paymentStatus, query.payment))
-  if (query.from) where.push(gte(orders.placedAt, lagosDayRange(query.from).start))
-  if (query.to) where.push(lt(orders.placedAt, lagosDayRange(query.to).end))
+  const range = parseDateRange(query)
+  if (range.from) where.push(gte(orders.placedAt, range.from))
+  if (range.to) where.push(lt(orders.placedAt, range.to))
   if (query.area) where.push(eq(orders.area, query.area))
   if (query.customerId) where.push(eq(orders.customerId, query.customerId))
   if (query.code) where.push(eq(discountCodes.code, query.code.toUpperCase()))
