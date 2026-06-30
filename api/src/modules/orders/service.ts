@@ -1,92 +1,16 @@
-import { and, eq, inArray, sql } from 'drizzle-orm'
+import { and, eq, inArray } from 'drizzle-orm'
 import { db } from '../../db/client.js'
-import {
-  deliverySlots,
-  orderItems,
-  orders,
-  products,
-  staffUsers,
-  stockMovements,
-  type OrderStatus,
-  type StaffUser,
-} from '../../db/schema/index.js'
+import { orderItems, orders, products, staffUsers, type OrderStatus, type StaffUser } from '../../db/schema/index.js'
 import { conflict, notFound, unprocessable } from '../../lib/http-errors.js'
 import { record } from '../audit/service.js'
-import { releaseUsage } from '../discounts/service.js'
-import { notifyOrderCancelled, notifyOutForDelivery } from '../notifications/service.js'
-import { findOrdersForUpdate, itemsFor } from './repo.js'
-
-export const TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-  pending: ['confirmed', 'cancelled'],
-  confirmed: ['picking', 'cancelled'],
-  picking: ['packed', 'cancelled'],
-  packed: ['out_for_delivery'],
-  out_for_delivery: ['delivered'],
-  delivered: [],
-  cancelled: [],
-}
-
-export const STATUS_LABELS: Record<OrderStatus, string> = {
-  pending: 'Pending',
-  confirmed: 'Confirmed',
-  picking: 'Picking',
-  packed: 'Packed',
-  out_for_delivery: 'Out for delivery',
-  delivered: 'Delivered',
-  cancelled: 'Cancelled',
-}
+import { findOrdersForUpdate } from './repo.js'
+import { applyTransition } from './transitions.js'
 
 export async function changeStatus(orderId: number, to: OrderStatus, actor: StaffUser, reason?: string) {
   return db.transaction(async (tx) => {
     const [order] = await findOrdersForUpdate(tx, [orderId])
     if (!order) throw notFound('Order')
-    if (order.status === to) return order
-    if (!TRANSITIONS[order.status].includes(to)) {
-      throw conflict(`Order ${order.number} is ${STATUS_LABELS[order.status].toLowerCase()} and cannot be moved to ${STATUS_LABELS[to].toLowerCase()}`)
-    }
-    const now = new Date()
-    const patch: Partial<typeof orders.$inferInsert> = { status: to, updatedAt: now }
-    if (to === 'confirmed') patch.confirmedAt = now
-    if (to === 'packed') patch.packedAt = now
-    if (to === 'delivered') patch.deliveredAt = now
-    if (to === 'cancelled') {
-      patch.cancelledAt = now
-      patch.cancelReason = reason ?? null
-      for (const item of await itemsFor(tx, order.id)) {
-        if (!item.productId) continue
-        const [p] = await tx
-          .update(products)
-          .set({ stock: sql`${products.stock} + ${item.quantity}` })
-          .where(eq(products.id, item.productId))
-          .returning({ stock: products.stock })
-        await tx.insert(stockMovements).values({
-          productId: item.productId,
-          kind: 'cancel',
-          quantity: item.quantity,
-          stockAfter: p.stock,
-          reason: `Order ${order.number} cancelled`,
-          staffId: actor.id,
-        })
-      }
-      if (order.slotId) {
-        await tx
-          .update(deliverySlots)
-          .set({ booked: sql`greatest(${deliverySlots.booked} - 1, 0)` })
-          .where(eq(deliverySlots.id, order.slotId))
-      }
-      if (order.discountCodeId) await releaseUsage(tx, order.discountCodeId)
-    }
-    const [updated] = await tx.update(orders).set(patch).where(eq(orders.id, order.id)).returning()
-    await record(tx, {
-      actorId: actor.id,
-      entity: 'order',
-      entityId: order.id,
-      action: `status.${to}`,
-      details: { from: order.status, to, ...(reason ? { reason } : {}) },
-    })
-    if (to === 'cancelled') await notifyOrderCancelled(tx, updated)
-    if (to === 'out_for_delivery') await notifyOutForDelivery(tx, updated)
-    return updated
+    return applyTransition(tx, order, to, { actorId: actor.id, reason })
   })
 }
 

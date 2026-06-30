@@ -5,7 +5,7 @@ import { customers, discountCodes, orders, type OrderStatus } from '../../db/sch
 import { toCsv } from '../../lib/csv.js'
 import { koboToNairaString } from '../../lib/money.js'
 import { csvParam, parseDateRange } from '../../lib/query.js'
-import { STATUS_LABELS } from '../orders/service.js'
+import { STATUS_LABELS } from '../orders/transitions.js'
 import { ORDER_EXPORT_COLUMNS } from './columns.js'
 
 const lagosStamp = (d: Date) =>

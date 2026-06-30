@@ -1,6 +1,10 @@
+import { db } from '../../db/client.js'
 import type { OrderStatus, StaffUser } from '../../db/schema/index.js'
+import { AppError } from '../../lib/http-errors.js'
+import { findOrdersForUpdate } from './repo.js'
 import type { BulkAction } from './schemas.js'
-import { assignPicker, changeStatus } from './service.js'
+import { assignPicker } from './service.js'
+import { applyTransition } from './transitions.js'
 
 const targetFor: Record<Exclude<BulkAction, 'assign_picker'>, OrderStatus> = {
   confirm: 'confirmed',
@@ -28,7 +32,11 @@ export async function runBulkAction(
       if (action === 'assign_picker') {
         await assignPicker(id, opts.pickerId ?? null, actor)
       } else {
-        await changeStatus(id, targetFor[action], actor, opts.reason)
+        await db.transaction(async (tx) => {
+          const [order] = await findOrdersForUpdate(tx, [id])
+          if (!order) throw new AppError(404, 'not_found', 'Order not found')
+          await applyTransition(tx, order, targetFor[action], { actorId: actor.id, reason: opts.reason })
+        })
       }
       results.push({ id, ok: true })
     } catch (err) {

@@ -3,7 +3,7 @@ import type { StaffUser } from '../../db/schema/index.js'
 import { formatPhone } from '../../lib/legacy/format.js'
 import type { historyFor } from '../audit/service.js'
 import type { orderDetail } from './repo.js'
-import { STATUS_LABELS, TRANSITIONS } from './service.js'
+import { STATUS_LABELS, TRANSITIONS } from './transitions.js'
 
 type Detail = NonNullable<Awaited<ReturnType<typeof orderDetail>>>
 type History = Awaited<ReturnType<typeof historyFor>>
