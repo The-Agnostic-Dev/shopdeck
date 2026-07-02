@@ -1,6 +1,7 @@
-import { and, count, desc, eq, ilike, or, sql, type SQL } from 'drizzle-orm'
+import { and, count, desc, eq, ilike, lt, or, sql, type SQL } from 'drizzle-orm'
 import { db } from '../../db/client.js'
 import { customers, orders } from '../../db/schema/index.js'
+import { decodeCursor, encodeCursor } from '../../lib/cursor.js'
 
 export interface CustomerListQuery {
   q?: string
@@ -28,7 +29,8 @@ const orderStats = {
 /** Newest customers first, in pages for the infinite list. */
 export async function listCustomers(query: CustomerListQuery) {
   const where = filters(query)
-  const offset = Math.max(0, Number(query.cursor ?? 0) || 0)
+  const cursor = decodeCursor(query.cursor)
+  const pageWhere = cursor ? [...where, lt(customers.createdAt, new Date(cursor.createdAt))] : where
 
   const [items, [{ total }]] = await Promise.all([
     db
@@ -43,21 +45,21 @@ export async function listCustomers(query: CustomerListQuery) {
         ...orderStats,
       })
       .from(customers)
-      .where(and(...where))
+      .where(and(...pageWhere))
       .orderBy(desc(customers.createdAt))
-      .limit(query.limit)
-      .offset(offset),
+      .limit(query.limit),
     db
       .select({ total: count() })
       .from(customers)
       .where(and(...where)),
   ])
 
+  const last = items[items.length - 1]
   const hasMore = items.length === query.limit
   return {
     items,
     total,
-    nextCursor: hasMore ? String(offset + items.length) : null,
+    nextCursor: hasMore && last ? encodeCursor({ createdAt: last.createdAt.toISOString() }) : null,
   }
 }
 
