@@ -1,7 +1,7 @@
 import { formatKobo } from '../../lib/money.js'
 import type { EmailMessage } from './client.js'
 
-const signoff = '\n\nỌjà Fresh'
+const signoff = '\n\nỌjà Fresh\nFresh groceries, delivered across Lagos\nhttps://ojafresh.ng'
 
 export function orderCancelledEmail(input: { to: string; name: string; orderNumber: string; reason?: string | null }): EmailMessage {
   return {
