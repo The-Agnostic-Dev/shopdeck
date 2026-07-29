@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
+import { useSearchParams } from 'react-router'
 import { lagosToday, shiftDay } from '@/lib/dates'
 
 export type DatePreset = '' | 'today' | 'yesterday' | '7d' | '30d' | 'custom'
@@ -12,7 +13,7 @@ export interface OrderFilters {
   to: string
 }
 
-const EMPTY: OrderFilters = { q: '', status: '', payment: '', preset: '', from: '', to: '' }
+const KEYS: (keyof OrderFilters)[] = ['q', 'status', 'payment', 'preset', 'from', 'to']
 
 export function rangeForPreset(preset: DatePreset): { from: string; to: string } | null {
   const today = lagosToday()
@@ -30,27 +31,65 @@ export function rangeForPreset(preset: DatePreset): { from: string; to: string }
   }
 }
 
+/** Order list filters live in the URL so a filtered view can be shared or bookmarked. */
 export function useOrderFilters() {
-  const [raw, setRaw] = useState<OrderFilters>(EMPTY)
-  const [page, setPage] = useState(1)
-  const [orderId, setOrderId] = useState<number | null>(null)
+  const [params, setParams] = useSearchParams()
 
   const filters = useMemo<OrderFilters>(() => {
-    const range = rangeForPreset(raw.preset)
-    return range ? { ...raw, ...range } : raw
-  }, [raw])
+    const preset = (params.get('preset') ?? '') as DatePreset
+    const range = rangeForPreset(preset)
+    return {
+      q: params.get('q') ?? '',
+      status: params.get('status') ?? '',
+      payment: params.get('payment') ?? '',
+      preset,
+      from: range?.from ?? params.get('from') ?? '',
+      to: range?.to ?? params.get('to') ?? '',
+    }
+  }, [params])
 
-  const setFilters = useCallback((patch: Partial<OrderFilters>) => {
-    setRaw((prev) => ({ ...prev, ...patch }))
-    setPage(1)
-  }, [])
+  const page = Math.max(1, Number(params.get('page') ?? '1') || 1)
+  const orderId = Number(params.get('order')) || null
 
-  const openOrder = useCallback((id: number | null) => setOrderId(id), [])
+  const setFilters = useCallback(
+    (patch: Partial<OrderFilters>) => {
+      setParams((prev) => {
+        const next = new URLSearchParams(prev)
+        for (const key of KEYS) {
+          if (!(key in patch)) continue
+          const value = patch[key]
+          if (value) next.set(key, value)
+          else next.delete(key)
+        }
+        return next
+      })
+    },
+    [setParams],
+  )
 
-  const clear = useCallback(() => {
-    setRaw(EMPTY)
-    setPage(1)
-  }, [])
+  const setPage = useCallback(
+    (p: number) =>
+      setParams((prev) => {
+        const next = new URLSearchParams(prev)
+        if (p > 1) next.set('page', String(p))
+        else next.delete('page')
+        return next
+      }),
+    [setParams],
+  )
+
+  const openOrder = useCallback(
+    (id: number | null) =>
+      setParams((prev) => {
+        const next = new URLSearchParams(prev)
+        if (id) next.set('order', String(id))
+        else next.delete('order')
+        return next
+      }),
+    [setParams],
+  )
+
+  const clear = useCallback(() => setParams(new URLSearchParams()), [setParams])
 
   return { filters, page, orderId, setFilters, setPage, openOrder, clear }
 }
