@@ -2,15 +2,10 @@ import { config } from '../config.js'
 
 const TZ = config.BUSINESS_TZ
 
-/** Offset of the business time zone from UTC, in minutes, at a given instant. */
-export function tzOffsetMinutes(at: Date = new Date()): number {
-  const part = new Intl.DateTimeFormat('en-US', { timeZone: TZ, timeZoneName: 'longOffset' })
-    .formatToParts(at)
-    .find((p) => p.type === 'timeZoneName')?.value
-  const m = part?.match(/GMT([+-])(\d{2}):(\d{2})/)
-  if (!m) throw new Error(`Cannot work out the UTC offset for ${TZ}`)
-  return (m[1] === '-' ? -1 : 1) * (Number(m[2]) * 60 + Number(m[3]))
-}
+// Lagos does not observe daylight saving, so the offset is fixed at +01:00.
+// Kept as a constant because Intl offset lookups are not available on every
+// slim base image we have deployed to.
+export const LAGOS_OFFSET_MINUTES = 60
 
 const dayFormatter = new Intl.DateTimeFormat('en-CA', {
   timeZone: TZ,
@@ -27,8 +22,7 @@ export function lagosDay(at: Date = new Date()): string {
 /** The instant a Lagos calendar day starts ("2026-11-03" -> 2026-11-02T23:00:00Z). */
 export function startOfLagosDay(day: string): Date {
   const [y, m, d] = day.split('-').map(Number)
-  const utcMidnight = new Date(Date.UTC(y, m - 1, d))
-  return new Date(utcMidnight.getTime() - tzOffsetMinutes(utcMidnight) * 60_000)
+  return new Date(Date.UTC(y, m - 1, d) - LAGOS_OFFSET_MINUTES * 60_000)
 }
 
 /** Half-open range [start, end) covering one Lagos calendar day. */
