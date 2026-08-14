@@ -28,6 +28,7 @@ export function LowStockPage() {
       <PageHeader
         title="Low stock"
         description="Active products at or below their reorder level. Ops is emailed once when a product drops to its reorder level."
+        actions={<ExportButton kind="products" filters={{ lowStock: 'true' }} />}
       />
       <Card>
         {data && !data.items.length ? (
