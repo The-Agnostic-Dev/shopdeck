@@ -5,6 +5,7 @@ import { addDays, lagosDay } from '../../lib/dates.js'
 import { notFound, unprocessable } from '../../lib/http-errors.js'
 
 export function slotState(slot: { capacity: number; booked: number }) {
+  if (slot.capacity === 0) return 'closed' as const
   if (slot.booked >= slot.capacity) return 'full' as const
   if (slot.booked >= slot.capacity * 0.8) return 'filling' as const
   return 'open' as const
