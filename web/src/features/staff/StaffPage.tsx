@@ -64,6 +64,15 @@ export function StaffPage() {
         description="Who can sign in to Shopdeck and what they can do."
         actions={<Button onClick={() => setAdding(true)}>Add staff</Button>}
       />
+      <Card className="mb-4 p-4 text-sm">
+        <ul className="grid gap-1 sm:grid-cols-2">
+          {ROLES.map((r) => (
+            <li key={r.value}>
+              <span className="font-medium">{r.label}:</span> <span className="text-[var(--muted)]">{r.help}</span>
+            </li>
+          ))}
+        </ul>
+      </Card>
       <Card>
         <Table>
           <TableHeader>
