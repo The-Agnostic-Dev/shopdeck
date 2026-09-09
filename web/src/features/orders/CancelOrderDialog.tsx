@@ -4,7 +4,7 @@ import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { ApiError } from '@/lib/api'
-import { useCancelOrder } from '@/lib/queries/orders'
+import { useCancelOrder } from './api'
 
 const REASONS = ['Customer asked to cancel', 'Items out of stock', 'Duplicate order', 'Out of delivery area', 'Payment reversed by bank']
 

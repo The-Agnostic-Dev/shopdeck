@@ -2,7 +2,7 @@ import { flexRender, getCoreRowModel, useReactTable, type OnChangeFn, type RowSe
 import { EmptyState } from '@/components/EmptyState'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import type { OrderRow } from '@/lib/queries/orders'
+import type { OrderRow } from './api'
 import { orderColumns } from './columns'
 
 interface Props {

@@ -43,10 +43,11 @@ export interface CreateRefundVars {
 export function useCreateRefund(orderId: number) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (body: CreateRefundVars) => api.post<{ refund: Refund }>(`/orders/${orderId}/refunds`, body),
+    mutationFn: ({ idempotencyKey, ...body }: CreateRefundVars) =>
+      api.post<{ refund: Refund; replayed: boolean }>(`/orders/${orderId}/refunds`, body, { 'Idempotency-Key': idempotencyKey }),
     onSuccess: async () => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: orderKeys.all }),
+        queryClient.invalidateQueries({ queryKey: orderKeys.detail(orderId) }),
         queryClient.invalidateQueries({ queryKey: refundKeys.all }),
         queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
       ])

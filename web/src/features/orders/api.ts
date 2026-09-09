@@ -71,7 +71,7 @@ export interface OrderListParams {
 
 export function useOrders(params: OrderListParams) {
   return useQuery({
-    queryKey: orderKeys.list(params),
+    queryKey: ['orders', params],
     queryFn: () => api.get<Paged<OrderRow>>('/orders', { ...params }),
     placeholderData: keepPreviousData,
   })

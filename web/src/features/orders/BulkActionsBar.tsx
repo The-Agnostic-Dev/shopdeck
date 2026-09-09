@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { pluralise } from '@/lib/utils'
-import { useBulkAction, usePickers, type BulkAction } from '@/lib/queries/orders'
+import { useBulkAction, usePickers, type BulkAction } from './api'
 
 const LABELS: Record<Exclude<BulkAction, 'assign_picker'>, string> = {
   confirm: 'Confirm',

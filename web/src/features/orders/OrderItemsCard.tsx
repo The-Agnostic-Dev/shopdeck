@@ -4,7 +4,7 @@ import { useAuth } from '@/auth/context'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { formatMoney } from '@/lib/money'
-import type { OrderDetail, OrderItem } from '@/lib/queries/orders'
+import type { OrderDetail, OrderItem } from './api'
 import { SubstituteDialog } from './SubstituteDialog'
 
 export function OrderItemsCard({ detail }: { detail: OrderDetail }) {

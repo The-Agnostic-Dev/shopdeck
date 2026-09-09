@@ -6,7 +6,7 @@ import { formatDateTime } from '@/lib/dates'
 import { titleCase } from '@/lib/format'
 import { formatMoney } from '@/lib/money'
 import { RefundDialog } from '../refunds/RefundDialog'
-import type { OrderDetail } from '@/lib/queries/orders'
+import type { OrderDetail } from './api'
 
 export function OrderPaymentCard({ detail }: { detail: OrderDetail }) {
   const { can } = useAuth()

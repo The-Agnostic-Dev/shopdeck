@@ -8,7 +8,7 @@ import { ApiError, api } from '@/lib/api'
 import { formatMoney } from '@/lib/money'
 import { productKeys } from '@/lib/queryKeys'
 import { cn } from '@/lib/utils'
-import { useSubstitute, type OrderItem } from '@/lib/queries/orders'
+import { useSubstitute, type OrderItem } from './api'
 
 interface ProductHit {
   id: number

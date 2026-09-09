@@ -3,7 +3,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { OrderStatusBadge, PaymentBadge } from '@/components/StatusBadge'
 import { formatDateTime, weekdayShort } from '@/lib/dates'
 import { formatMoney } from '@/lib/money'
-import type { OrderRow } from '@/lib/queries/orders'
+import type { OrderRow } from './api'
 
 const methodLabel = (o: OrderRow) =>
   o.paymentMethod === 'card' ? `Card •••• ${o.cardLast4 ?? '????'}` : o.paymentMethod === 'transfer' ? 'Bank transfer' : 'USSD'
