@@ -18,7 +18,7 @@ export async function enqueue(type: JobType, payload: Record<string, unknown>, o
       type,
       payload,
       runAt: opts.runAt ?? new Date(),
-      maxAttempts: opts.maxAttempts ?? 1,
+      maxAttempts: opts.maxAttempts ?? config.JOB_MAX_ATTEMPTS,
     })
     .returning({ id: jobs.id })
   return job.id
@@ -45,8 +45,18 @@ export async function markDone(id: number) {
   await db.execute(sql`update jobs set status = 'done', locked_at = null, last_error = null, updated_at = now() where id = ${id}`)
 }
 
-export async function markFailed(id: number, error: string) {
-  await db.execute(sql`update jobs set status = 'failed', locked_at = null, last_error = ${error}, updated_at = now() where id = ${id}`)
+export async function markFailed(job: Job, error: string, backoffMs: number) {
+  if (job.attempts < job.maxAttempts) {
+    const delay = backoffMs * 2 ** (job.attempts - 1)
+    await db.execute(sql`
+      update jobs set status = 'queued', locked_at = null, last_error = ${error},
+        run_at = now() + (${delay} || ' milliseconds')::interval, updated_at = now()
+      where id = ${job.id}
+    `)
+    return 'retrying' as const
+  }
+  await db.execute(sql`update jobs set status = 'failed', locked_at = null, last_error = ${error}, updated_at = now() where id = ${job.id}`)
+  return 'failed' as const
 }
 
 /** Puts jobs whose worker died back in the queue. */

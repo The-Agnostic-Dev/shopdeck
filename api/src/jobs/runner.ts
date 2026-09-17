@@ -30,7 +30,7 @@ async function tick() {
 async function runOne(job: Awaited<ReturnType<typeof claimDueJobs>>[number]) {
   const handler = handlers[job.type as JobType]
   if (!handler) {
-    await markFailed(job.id, `no handler for job type ${job.type}`)
+    await markFailed({ ...job, maxAttempts: job.attempts }, `no handler for job type ${job.type}`, 0)
     return
   }
   const started = Date.now()
@@ -40,8 +40,8 @@ async function runOne(job: Awaited<ReturnType<typeof claimDueJobs>>[number]) {
     log.info('job done', { id: job.id, type: job.type, attempt: job.attempts, ms: Date.now() - started })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
-    await markFailed(job.id, message)
-    log.warn('job failed', { id: job.id, type: job.type, err: message })
+    const outcome = await markFailed(job, message, config.JOB_BACKOFF_MS)
+    log.warn('job failed', { id: job.id, type: job.type, attempt: job.attempts, outcome, err: message })
   }
 }
 

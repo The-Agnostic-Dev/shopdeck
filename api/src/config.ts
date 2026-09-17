@@ -31,6 +31,8 @@ const schema = z.object({
   RUN_WORKER: z.enum(['inline', 'off']).default('inline'),
   WORKER_POLL_MS: int(500),
   WORKER_CONCURRENCY: int(2),
+  JOB_MAX_ATTEMPTS: int(3),
+  JOB_BACKOFF_MS: int(1000),
   CRON_ENABLED: bool(true),
   LOW_STOCK_SWEEP_MINUTES: int(60),
   REFUND_SYNC_INTERVAL_SECONDS: int(60),
