@@ -1,5 +1,6 @@
 import { can } from '../../auth/permissions.js'
 import type { StaffUser } from '../../db/schema/index.js'
+import { describeProviderStatus } from '../../integrations/payfront/status.js'
 import { formatPhone } from '../../lib/legacy/format.js'
 import type { historyFor } from '../audit/service.js'
 import type { orderDetail } from './repo.js'
@@ -30,7 +31,10 @@ export function serializeOrderDetail(detail: Detail, history: History, viewer: S
       phone: showContact ? formatPhone(customer.phone) : null,
     },
     items: detail.items,
-    refunds: detail.refunds,
+    refunds: detail.refunds.map((r) => ({
+      ...r,
+      providerStatusText: describeProviderStatus(r.providerStatus),
+    })),
     history,
   }
 }
