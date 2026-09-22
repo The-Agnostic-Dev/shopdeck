@@ -13,6 +13,9 @@ export interface SandboxCharge {
   last4: string | null
 }
 
+/** Sandbox test card whose refunds are processed and then reversed by the issuing bank. */
+export const REVERSAL_TEST_CARD_LAST4 = '6666'
+
 export async function findCharge(reference: string): Promise<SandboxCharge | null> {
   const [row] = await db
     .select({ id: orders.id, amount: orders.totalKobo, last4: orders.cardLast4 })

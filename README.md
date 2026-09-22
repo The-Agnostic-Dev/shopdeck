@@ -111,7 +111,7 @@ Nothing in development talks to the internet. Each provider has a fake mounted i
 
 | Provider | Real use | Fake | Notes |
 | --- | --- | --- | --- |
-| Payfront | card and transfer payments, refunds | `api/src/integrations/payfront/fake` | Refunds answer after ~400 ms, then signed webhooks arrive: `refund.processing`, `refund.processed`. |
+| Payfront | card and transfer payments, refunds | `api/src/integrations/payfront/fake` | Refunds answer after ~400 ms, then signed webhooks arrive: `refund.processing`, `refund.processed`. In the sandbox, refunds on charges paid with the test card ending **6666** are reversed by the "bank" a moment after being processed (`refund.reversed`). |
 | Sendbox | transactional email (v3 API) | `api/src/integrations/mail/fake.ts` | Accepts the message, stores it in the dev outbox. |
 | Textng | SMS | `api/src/integrations/sms/fake.ts` | Same, for SMS. |
 

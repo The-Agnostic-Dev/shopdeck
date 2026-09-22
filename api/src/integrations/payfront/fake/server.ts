@@ -3,7 +3,7 @@ import { config } from '../../../config.js'
 import { logger } from '../../../lib/logger.js'
 import { signPayload } from '../signature.js'
 import type { PayfrontEventName, PayfrontRefund, PayfrontRefundStatus } from '../types.js'
-import { findCharge } from './ledger.js'
+import { findCharge, REVERSAL_TEST_CARD_LAST4 } from './ledger.js'
 
 // Sandbox Payfront. Behaves like the hosted sandbox for the calls Shopdeck
 // makes: refunds are queued, then move through processing to processed, and
@@ -38,10 +38,21 @@ function advance(refund: PayfrontRefund, status: PayfrontRefundStatus, extra: Pa
 function schedule(refund: PayfrontRefund, last4: string | null) {
   const step = config.FAKE_PAYFRONT_WEBHOOK_DELAY_MS
   setTimeout(async () => {
+    advance(refund, 'processing')
+    await deliver('refund.processing', refund)
+  }, step)
+  setTimeout(async () => {
     advance(refund, 'processed', { refunded_at: new Date().toISOString() })
     await deliver('refund.processed', refund)
-  }, step)
-  void last4
+  }, step * 2)
+  if (last4 === REVERSAL_TEST_CARD_LAST4) {
+    setTimeout(async () => {
+      advance(refund, 'reversed', { failure_reason: 'Beneficiary bank returned the funds' })
+      const ref = refund.transaction.reference
+      refundedByCharge.set(ref, (refundedByCharge.get(ref) ?? 0) - refund.amount)
+      await deliver('refund.reversed', refund)
+    }, step * 3)
+  }
 }
 
 export const payfrontFake = new Hono()
