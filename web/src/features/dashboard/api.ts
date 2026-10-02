@@ -21,5 +21,6 @@ export function useDashboard(day: string) {
   return useQuery({
     queryKey: dashboardKeys.day(day),
     queryFn: () => api.get<DashboardData>('/dashboard', { day }),
+    refetchInterval: 60_000,
   })
 }
