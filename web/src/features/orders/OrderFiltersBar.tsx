@@ -1,5 +1,5 @@
 import { Search, X } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
@@ -15,6 +15,13 @@ interface Props {
 export function OrderFiltersBar({ filters, onChange, onClear }: Props) {
   const [q, setQ] = useState(filters.q)
 
+  // Search as you type, but not on every key stroke.
+  useEffect(() => {
+    if (q === filters.q) return
+    const t = setTimeout(() => onChange({ q }), 300)
+    return () => clearTimeout(t)
+  }, [q, filters.q, onChange])
+
   const active = Object.values(filters).some(Boolean)
 
   return (
@@ -26,10 +33,7 @@ export function OrderFiltersBar({ filters, onChange, onClear }: Props) {
           placeholder="Order number, customer or phone"
           className="pl-8"
           value={q}
-          onChange={(e) => {
-            setQ(e.target.value)
-            onChange({ q: e.target.value })
-          }}
+          onChange={(e) => setQ(e.target.value)}
         />
       </div>
       <Select aria-label="Status" value={filters.status} onChange={(e) => onChange({ status: e.target.value })}>
