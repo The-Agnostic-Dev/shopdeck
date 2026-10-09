@@ -26,7 +26,7 @@ export function OrderFiltersBar({ filters, onChange, onClear }: Props) {
 
   return (
     <div className="flex flex-wrap items-center gap-2 border-b border-[var(--border)] p-3">
-      <div className="relative flex-1">
+      <div className="relative min-w-56 flex-1">
         <Search className="pointer-events-none absolute left-2.5 top-2.5 size-4 text-[var(--muted)]" />
         <Input
           aria-label="Search orders"
@@ -43,6 +43,7 @@ export function OrderFiltersBar({ filters, onChange, onClear }: Props) {
             {label}
           </option>
         ))}
+        <option value="pending,confirmed,picking">Open (not yet packed)</option>
       </Select>
       <Select aria-label="Payment" value={filters.payment} onChange={(e) => onChange({ payment: e.target.value })}>
         <option value="">Any payment</option>
