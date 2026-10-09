@@ -55,7 +55,7 @@ export function OrderFiltersBar({ filters, onChange, onClear }: Props) {
         value={filters.preset}
         onChange={(e) => {
           const preset = e.target.value as DatePreset
-          onChange({ preset })
+          onChange(preset === 'custom' ? { preset } : { preset, from: '', to: '' })
         }}
       >
         <option value="">Any date</option>
