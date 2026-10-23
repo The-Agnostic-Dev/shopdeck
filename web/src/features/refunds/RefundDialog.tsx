@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -11,8 +12,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { ApiError } from '@/lib/api'
+import { ApiError, api } from '@/lib/api'
 import { formatMoney, koboToInput, parseMoneyInput } from '@/lib/money'
+import { orderKeys } from '@/lib/queryKeys'
+import type { OrderDetail } from '../orders/api'
 import { REFUND_REASONS, useCreateRefund, type RefundReason } from './api'
 
 interface Props {
@@ -27,6 +30,7 @@ const reasonValues = REFUND_REASONS.map((r) => r.value) as [RefundReason, ...Ref
 
 export function RefundDialog({ open, onOpenChange, orderId, orderNumber, refundableKobo }: Props) {
   const refund = useCreateRefund(orderId)
+  const queryClient = useQueryClient()
   const schema = z.object({
     amount: z
       .string()
@@ -50,6 +54,16 @@ export function RefundDialog({ open, onOpenChange, orderId, orderNumber, refunda
   const onSubmit = form.handleSubmit(async (values) => {
     try {
       const amountKobo = parseMoneyInput(values.amount)!
+      // Someone else may have refunded this order since the panel was opened.
+      const latest = await queryClient.fetchQuery({
+        queryKey: orderKeys.detail(orderId),
+        queryFn: () => api.get<OrderDetail>(`/orders/${orderId}`),
+        staleTime: 0,
+      })
+      if (amountKobo > latest.order.refundableKobo) {
+        form.setError('amount', { message: `Only ${formatMoney(latest.order.refundableKobo)} is left to refund on this order` })
+        return
+      }
       await refund.mutateAsync({
         amountKobo,
         reason: values.reason,
