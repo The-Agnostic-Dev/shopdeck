@@ -132,6 +132,10 @@ npm run build
 
 There are only a few unit tests (money helpers). CI (`.github/workflows/ci.yml`) runs lint, typecheck and build on every pull request and on main. Most of our checking is done by hand against the seeded data; the PR template has the list.
 
+## Configuration
+
+Every setting has a working default; see `.env.example` for the full list with comments. Put overrides in `.env` at the repo root. The ones you are most likely to touch: `DATABASE_URL`, `PORT`, `RUN_WORKER`, `SEED_ON_START`, `LOG_LEVEL`, `JOB_MAX_ATTEMPTS`.
+
 ## Conventions
 
 - Branch from `main`, open a PR, squash merge. Conventional commit titles with the Linear ticket: `fix(refunds): [OJA-123] short summary`.
