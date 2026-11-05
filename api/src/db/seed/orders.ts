@@ -29,10 +29,10 @@ const WINDOWS = [
 
 // Most recent orders are still moving through the warehouse.
 const PIPELINE: [OrderStatus, number][] = [
-  ['pending', 48],
-  ['confirmed', 26],
-  ['picking', 18],
-  ['packed', 14],
+  ['pending', 72],
+  ['confirmed', 36],
+  ['picking', 22],
+  ['packed', 20],
   ['out_for_delivery', 14],
 ]
 
