@@ -38,6 +38,7 @@ services:
       retries: 30
 
   worker:
+    build: .
     image: shopdeck:dev
     command: ['node', 'dist/worker.js']
     environment:
