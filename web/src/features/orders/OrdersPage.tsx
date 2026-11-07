@@ -9,15 +9,18 @@ import { BulkActionsBar } from './BulkActionsBar'
 import { OrderDrawer } from './OrderDrawer'
 import { OrderFiltersBar } from './OrderFiltersBar'
 import { OrdersTable } from './OrdersTable'
+import { KEYS } from './filterParams'
 import { useOrderFilters } from './useOrderFilters'
 
 export function OrdersPage() {
   const { filters, page, orderId, setFilters, setPage, openOrder, clear } = useOrderFilters()
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
+  const filterKey = KEYS.map((key) => filters[key]).join('\u0000')
+
   useEffect(() => {
     setRowSelection({})
-  }, [filters.q, filters.status, filters.payment, filters.preset, filters.from, filters.to])
+  }, [filterKey])
 
   const orders = useOrders({
     page,
