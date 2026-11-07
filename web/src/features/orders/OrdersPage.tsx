@@ -1,5 +1,5 @@
 import type { RowSelectionState } from '@tanstack/react-table'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { PageHeader } from '@/components/PageHeader'
 import { Pagination } from '@/components/Pagination'
 import { Alert } from '@/components/ui/alert'
@@ -9,11 +9,18 @@ import { BulkActionsBar } from './BulkActionsBar'
 import { OrderDrawer } from './OrderDrawer'
 import { OrderFiltersBar } from './OrderFiltersBar'
 import { OrdersTable } from './OrdersTable'
+import { KEYS } from './filterParams'
 import { useOrderFilters } from './useOrderFilters'
 
 export function OrdersPage() {
   const { filters, page, orderId, setFilters, setPage, openOrder, clear } = useOrderFilters()
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+
+  const filterKey = KEYS.map((key) => filters[key]).join('\u0000')
+
+  useEffect(() => {
+    setRowSelection({})
+  }, [filterKey])
 
   const orders = useOrders({
     page,

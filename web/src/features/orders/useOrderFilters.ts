@@ -1,19 +1,9 @@
 import { useCallback, useMemo } from 'react'
 import { useSearchParams } from 'react-router'
 import { lagosToday, shiftDay } from '@/lib/dates'
+import { applyFilterPatch, type DatePreset, type OrderFilters } from './filterParams'
 
-export type DatePreset = '' | 'today' | 'yesterday' | '7d' | '30d' | 'custom'
-
-export interface OrderFilters {
-  q: string
-  status: string
-  payment: string
-  preset: DatePreset
-  from: string
-  to: string
-}
-
-const KEYS: (keyof OrderFilters)[] = ['q', 'status', 'payment', 'preset', 'from', 'to']
+export type { DatePreset, OrderFilters }
 
 export function rangeForPreset(preset: DatePreset): { from: string; to: string } | null {
   const today = lagosToday()
@@ -53,16 +43,7 @@ export function useOrderFilters() {
 
   const setFilters = useCallback(
     (patch: Partial<OrderFilters>) => {
-      setParams((prev) => {
-        const next = new URLSearchParams(prev)
-        for (const key of KEYS) {
-          if (!(key in patch)) continue
-          const value = patch[key]
-          if (value) next.set(key, value)
-          else next.delete(key)
-        }
-        return next
-      })
+      setParams((prev) => applyFilterPatch(prev, patch))
     },
     [setParams],
   )
