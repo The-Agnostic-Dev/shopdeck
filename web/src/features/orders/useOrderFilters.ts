@@ -61,6 +61,7 @@ export function useOrderFilters() {
           if (value) next.set(key, value)
           else next.delete(key)
         }
+        next.delete('page')
         return next
       })
     },
